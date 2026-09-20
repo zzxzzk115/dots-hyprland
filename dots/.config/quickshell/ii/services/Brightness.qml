@@ -124,6 +124,7 @@ Singleton {
 
         function initialize() {
             monitor.ready = false;
+            if (screen.name.startsWith("WAYLAND-") || screen.name.startsWith("HEADLESS-")) { initializeMonitor(root.monitors.indexOf(monitor) + 1); return; }
             const match = root.ddcMonitors.find(m => m.name === screen.name && !root.monitors.slice(0, root.monitors.indexOf(this)).some(mon => mon.busNum === m.busNum));
             isDdc = !!match;
             busNum = match?.busNum ?? "";
@@ -155,6 +156,7 @@ Singleton {
         }
 
         function syncBrightness() {
+            if (!monitor.ready || !isFinite(monitor.multipliedBrightness)) return;
             const brightnessValue = Math.max(monitor.multipliedBrightness, 0);
             if (isDdc) {
                 const rawValueRounded = Math.max(Math.floor(brightnessValue * monitor.rawMaxBrightness), 1);

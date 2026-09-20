@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+base="$HOME/.local/share/end4-vendetta"
+export XDG_CACHE_HOME="$HOME/.cache/end4-vendetta"
+"$base/runtime/usr/bin/cliphist" store
+"$base/repo/vendetta/qs" -c ii ipc call cliphistService update >/dev/null 2>&1 || true

@@ -18,6 +18,7 @@ import Quickshell.Hyprland
 
 ShellRoot {
     id: root
+    FontLoader { source: "file://" + Quickshell.env("END4_RUNTIME") + "/fonts/MaterialSymbolsRounded.ttf" }
 
     // Stuff for every panel family
     ReloadPopup {}
@@ -25,11 +26,11 @@ ShellRoot {
     Component.onCompleted: {
         MaterialThemeLoader.reapplyTheme()
         Hyprsunset.load()
-        FirstRunExperience.load()
-        ConflictKiller.load()
+        // Vendetta profile: preserve the selected wallpaper.
+        // Never kill KDE services or other sessions.
         Cliphist.refresh()
         Wallpapers.load()
-        Updates.load()
+        // Updates are managed explicitly in the personal fork.
     }
 
 

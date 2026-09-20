@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+base="$HOME/.local/share/end4-vendetta"
+export END4_RUNTIME="$base/runtime"
+export XDG_CONFIG_HOME="$HOME/.config/hypr/end4-session"
+export XDG_STATE_HOME="$HOME/.local/state/end4-vendetta"
+export XDG_CACHE_HOME="$HOME/.cache/end4-vendetta"
+export LD_LIBRARY_PATH="$END4_RUNTIME/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export QML_IMPORT_PATH="$END4_RUNTIME/usr/lib/qt6/qml${QML_IMPORT_PATH:+:$QML_IMPORT_PATH}"
+export QT_PLUGIN_PATH="$END4_RUNTIME/usr/lib/qt6/plugins${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
+export PATH="$base/repo/vendetta:$END4_RUNTIME/usr/bin:$PATH"
+export XDG_DATA_DIRS="$END4_RUNTIME/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+export QT_QPA_PLATFORM=wayland
+export QT_QUICK_CONTROLS_STYLE=Basic
+export QT_QPA_PLATFORMTHEME=kde
+exec "$END4_RUNTIME/usr/bin/quickshell" "$@"

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+base="$HOME/.local/share/end4-vendetta"
+# Terminal children use the normal user application config, not the shell sandbox.
+unset XDG_CONFIG_HOME XDG_STATE_HOME XDG_CACHE_HOME QT_PLUGIN_PATH QML_IMPORT_PATH
+export LD_LIBRARY_PATH="$base/runtime/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export TERMINFO="$base/runtime/usr/share/terminfo"
+exec "$base/runtime/usr/bin/kitty" --config "$base/repo/vendetta/kitty.conf" "$@"

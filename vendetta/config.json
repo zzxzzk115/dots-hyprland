@@ -1,0 +1,65 @@
+{
+  "panelFamily": "ii",
+  "policies": {
+    "ai": 0,
+    "weeb": 0
+  },
+  "appearance": {
+    "extraBackgroundTint": false,
+    "fakeScreenRounding": 0,
+    "fonts": {
+      "main": "Noto Sans",
+      "numbers": "Noto Sans",
+      "title": "Noto Sans",
+      "iconNerd": "MesloLGS Nerd Font",
+      "monospace": "MesloLGS Nerd Font",
+      "reading": "Noto Sans",
+      "expressive": "Noto Sans"
+    },
+    "transparency": {
+      "enable": true,
+      "automatic": false,
+      "backgroundTransparency": 0.06,
+      "contentTransparency": 0.9
+    },
+    "wallpaperTheming": {
+      "enableAppsAndShell": false,
+      "enableQtApps": false,
+      "enableTerminal": false
+    },
+    "palette": {
+      "type": "scheme-tonal-spot",
+      "accentColor": "#C62828"
+    }
+  },
+  "background": {
+    "wallpaperPath": "@WALLPAPER@",
+    "widgets": {
+      "clock": {
+        "enable": false
+      },
+      "weather": {
+        "enable": false
+      }
+    },
+    "parallax": {
+      "enableWorkspace": false,
+      "enableSidebar": false
+    }
+  },
+  "apps": {
+    "terminal": "@KITTY@"
+  },
+  "bar": {
+    "cornerStyle": 1
+  },
+  "light": {
+    "night": {
+      "automatic": false
+    }
+  },
+  "conflictKiller": {
+    "autoKillTrays": false,
+    "autoKillNotificationDaemons": false
+  }
+}
