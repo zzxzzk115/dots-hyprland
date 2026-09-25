@@ -13,6 +13,19 @@ import Quickshell.Hyprland
 
 ButtonMouseArea {
     id: root
+    readonly property var categoryNames: ["Browser", "Development", "System", "Research", "Graphics",
+        "AI", "Communication", "Office", "Entertainment", "Temporary"]
+    StyledPopup {
+        hoverTarget: root
+        active: root.containsMouse && !root.pressed
+        StyledText {
+            anchors.centerIn: parent
+            text: {
+                const id = wsModel.getWorkspaceIdAt(root.hoverIndex);
+                return id + " · " + (root.categoryNames[id - 1] || "Workspace");
+            }
+        }
+    }
 
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(root.QsWindow.window?.screen)
     WorkspaceModel {

@@ -182,3 +182,17 @@ Validation: the compositor accepted all rules with no configuration errors. Ten
 temporary Kitty windows with representative app IDs verified routes 1–9 and the
 unclassified fallback, with no active-workspace change. These tests validate rule
 behavior, not every application's actual startup identifier or dialog behavior.
+
+
+Workspace display names are now Browser, Development, System, Research, Graphics,
+AI, Communication, Office, Entertainment and Temporary (IDs 1–10 unchanged).
+The compact bar retains its icons/numbers and shows the category on hover.
+
+Optional `code` wrapper expects the Microsoft stable archive unpacked under
+`~/.local/opt/vscode-1.139.1/VSCode-linux-x64`; render `code.desktop.in` as above.
+This is a user-local installation, not a pacman-managed package; update the
+archive directory and launcher/icon paths when upgrading. Native Wayland on
+Hyprland was verified, with the actual Code window opening on workspace 2.
+The `linuxqq` wrapper similarly isolates shell environment and selects Wayland
+only on Hyprland; its expected app directory is version-specific. Neither
+application binary nor its personal settings are committed.

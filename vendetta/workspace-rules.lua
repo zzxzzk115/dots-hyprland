@@ -31,3 +31,10 @@ hl.window_rule({
     workspace = '9 silent',
 })
 -- No catch-all: unknown applications and workspace 10 remain unrestricted.
+
+-- Keep numeric workspace IDs and shortcuts; give each category an English name.
+local workspaceNames = {'Browser', 'Development', 'System', 'Research', 'Graphics',
+    'AI', 'Communication', 'Office', 'Entertainment', 'Temporary'}
+for id, name in ipairs(workspaceNames) do
+    hl.workspace_rule({ workspace = tostring(id), default_name = name })
+end

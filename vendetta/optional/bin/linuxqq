@@ -1,0 +1,11 @@
+#!/bin/sh
+# end4's isolated settings and Qt libraries belong to its shell, not QQ.
+if [ "${XDG_CONFIG_HOME:-}" = "$HOME/.config/hypr/end4-session" ]; then
+    unset XDG_CONFIG_HOME XDG_STATE_HOME XDG_CACHE_HOME
+fi
+unset LD_LIBRARY_PATH QT_PLUGIN_PATH QML_IMPORT_PATH QML2_IMPORT_PATH
+case "${XDG_CURRENT_DESKTOP:-}" in
+    *Hyprland*|*hyprland*)
+        exec "$HOME/.local/opt/linuxqq-3.2.33-52892/qq" --ozone-platform=wayland "$@" ;;
+esac
+exec "$HOME/.local/opt/linuxqq-3.2.33-52892/qq" "$@"
