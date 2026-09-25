@@ -4,7 +4,7 @@
 local categories = {
     {1, 'browser', [[(?i)^(microsoft-edge(-.*)?|firefox|org.mozilla.firefox|chromium|google-chrome(-.*)?)$]]},
     {2, 'development', [[(?i)^(jetbrains-.*|code|code-oss|vscodium|codium|dev.zed.Zed|sublime_text|cmake-gui)$]]},
-    {3, 'system', [[(?i)^(org.kde.plasma-systemmonitor|plasma-systemmonitor|systemsettings|org.kde.systemsettings|org.kde.kinfocenter|remmina|org.remmina.Remmina|btop|htop)$]]},
+    {3, 'system', [[(?i)^(org.kde.plasma-systemmonitor|plasma-systemmonitor|systemsettings|org.kde.systemsettings|org.kde.kinfocenter|rustdesk|com.carriez.RustDesk|btop|htop)$]]},
     {4, 'research', [[(?i)^(zotero|org.zotero.Zotero|obsidian|md.obsidian.Obsidian|okular|org.kde.okular|texstudio|org.texstudio.TeXstudio|jabref|org.jabref.JabRef|jupyterlab)$]]},
     {5, 'graphics', [[(?i)^(godot.*|org.godotengine.*|blender|org.blender.Blender|renderdoc|qrenderdoc|.*nsight.*|ncu-ui|nsys-ui|nv-nsight-gfx)$]]},
     {6, 'ai', [[(?i)^(chatgpt|codex|claude|com.anthropic.claudefordesktop)$]]},

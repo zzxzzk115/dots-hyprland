@@ -162,7 +162,7 @@ remain unchanged; Super+0 selects workspace 10.
 |---|---|---|
 | 1 | Browser | Edge, Firefox, Chromium |
 | 2 | Development | CLion/JetBrains, VS Code, CMake GUI |
-| 3 | Terminal/system | System Monitor, System Settings, Remmina; terminals stay local |
+| 3 | Terminal/system | System Monitor, System Settings, RustDesk; terminals stay local |
 | 4 | Research | Zotero, Obsidian, Okular, TeXstudio |
 | 5 | Graphics | Godot, Blender, RenderDoc, Nsight |
 | 6 | AI | ChatGPT, Codex, Claude |
