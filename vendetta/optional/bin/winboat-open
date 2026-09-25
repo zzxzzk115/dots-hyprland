@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+"""Open a local EXE in the existing WinBoat VM using a RemoteApp session."""
+import os,sys,json,time,subprocess,urllib.request,urllib.parse,socket,base64,tempfile,threading,shutil
+from pathlib import Path
+import yaml,fcntl,hashlib
+H=Path.home();STATE=H/'.local/state/winboat-open'
+def message(text,error=False):
+ subprocess.run(['kdialog','--title','WinBoat', '--error' if error else '--msgbox',text],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+def docker(*args):
+ cmd=['docker',*args]
+ r=subprocess.run(cmd,capture_output=True,text=True,timeout=30)
+ if r.returncode and 'permission denied' in r.stderr.lower():
+  import shlex
+  r=subprocess.run(['sg','docker','-c',shlex.join(cmd)],capture_output=True,text=True,timeout=30)
+ if r.returncode:raise RuntimeError('无法操作 WinBoat 容器，请确认 Docker 已启动且当前账号拥有访问权限。')
+ return r.stdout
+def inspect():return json.loads(docker('inspect','WinBoat'))[0]
+def hostport(info,port):
+ rows=info['NetworkSettings']['Ports'].get(str(port)+'/tcp') or []
+ if not rows:raise RuntimeError('WinBoat 端口映射缺失：'+str(port))
+ if rows[0]['HostIp'] not in ('127.0.0.1','0.0.0.0',''):raise RuntimeError('不支持非本机 WinBoat 地址。')
+ return int(rows[0]['HostPort'])
+def wait_ready(info):
+ if not info['State']['Running']:
+  subprocess.run(['notify-send','WinBoat','正在启动 Windows，请稍候…'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+  docker('start','WinBoat')
+ deadline=time.monotonic()+240
+ opener=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+ while time.monotonic()<deadline:
+  try:
+   info=inspect();api=hostport(info,7148);rdp=hostport(info,3389)
+   with opener.open('http://127.0.0.1:%d/health'%api,timeout=3) as response:
+    if response.status!=200:raise RuntimeError()
+   with socket.create_connection(('127.0.0.1',rdp),timeout=3):pass
+   return rdp
+  except Exception:time.sleep(2)
+ raise RuntimeError('Windows 在 4 分钟内未就绪，请打开 WinBoat 检查 Windows 是否正在更新或安装。')
+def psquote(s):return "'"+s.replace("'","''")+"'"
+def script(filename):
+ path='\\\\tsclient\\winboat-exe\\'+filename
+ return '''$ErrorActionPreference='Stop'
+$target=TARGET
+$status='\\\\tsclient\\winboat-bridge\\status.json'
+try {
+ $deadline=(Get-Date).AddSeconds(60)
+ while (!(Test-Path -LiteralPath $target)) { if((Get-Date) -gt $deadline){throw '共享目录连接超时'}; Start-Sleep -Milliseconds 500 }
+ $process=Start-Process -FilePath $target -WorkingDirectory (Split-Path -LiteralPath $target) -PassThru
+ @{state='started';pid=$process.Id;name=$process.ProcessName}|ConvertTo-Json|Set-Content -LiteralPath $status -Encoding UTF8
+ $process.WaitForExit()
+ @{state='exited';code=$process.ExitCode}|ConvertTo-Json|Set-Content -LiteralPath $status -Encoding UTF8
+} catch {
+ @{state='error';message=$_.Exception.Message}|ConvertTo-Json|Set-Content -LiteralPath $status -Encoding UTF8
+}
+'''.replace('TARGET',psquote(path))
+def launch(path):
+ path=path.expanduser().resolve(strict=True)
+ if path.suffix.lower()!='.exe' or not path.is_file():raise RuntimeError('请选择一个 EXE 文件。')
+ with path.open('rb') as f:
+  if f.read(2)!=b'MZ':raise RuntimeError('该文件不是 Windows 可执行文件。')
+ if any(c in str(path) for c in '\r\n,'):raise RuntimeError('文件路径包含换行或逗号，请先移动到普通路径。')
+ STATE.mkdir(parents=True,exist_ok=True);STATE.chmod(0o700)
+ lock=(STATE/(hashlib.sha256(str(path).encode()).hexdigest()+'.lock')).open('w')
+ try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+ except BlockingIOError:
+  subprocess.run(['notify-send','WinBoat','这个程序正在启动或运行，请查看已有窗口。']);return
+ rdp=wait_ready(inspect())
+ config=yaml.safe_load((H/'.winboat/docker-compose.yml').read_text());env=config['services']['windows']['environment']
+ username=str(env['USERNAME']);password=str(env['PASSWORD'])
+ if any(c in username+password for c in '\r\n'):raise RuntimeError('不支持带换行的 Windows 凭据。')
+ STATE.mkdir(parents=True,exist_ok=True);STATE.chmod(0o700)
+ run=Path(tempfile.mkdtemp(prefix='launch-',dir=STATE));run.chmod(0o700)
+ code=base64.b64encode(script(path.name).encode('utf-16le')).decode()
+ settings=json.loads((H/'.winboat/winboat.config.json').read_text())
+ args=['/log-level:ERROR','/u:'+username,'/p:'+password,'/v:127.0.0.1','/port:'+str(rdp),'/cert:tofu','+clipboard','/sound:sys:pulse','/compression','-wallpaper','/scale-desktop:'+str(settings.get('scaleDesktop',100)),'/wm-class:winboat-exe','/drive:winboat-exe,'+str(path.parent),'/drive:winboat-bridge,'+str(run),'/app:program:powershell.exe,name:WinBoat EXE,cmd:-NoProfile -NonInteractive -WindowStyle Hidden -EncodedCommand '+code]
+ log=(run/'rdp.log').open('w');os.chmod(log.name,0o600)
+ childenv=os.environ.copy()
+ for k in ('LD_LIBRARY_PATH','QT_PLUGIN_PATH','QML_IMPORT_PATH'):childenv.pop(k,None)
+ p=subprocess.Popen(['/usr/bin/xfreerdp3','/args-from:stdin'],stdin=subprocess.PIPE,stdout=log,stderr=log,env=childenv)
+ p.stdin.write(('\n'.join(args)+'\n').encode());p.stdin.close()
+ print('Launch status directory:',run,flush=True)
+ deadline=time.monotonic()+90;started=False
+ while time.monotonic()<deadline:
+  status=run/'status.json'
+  if status.exists():
+   try:d=json.loads(status.read_text(encoding='utf-8-sig'))
+   except (ValueError,OSError):time.sleep(.3);continue
+   if d['state']=='error':p.terminate();raise RuntimeError('Windows 无法启动程序：'+d['message'])
+   if d['state'] in ('started','exited'):
+    print(json.dumps(d,ensure_ascii=False),flush=True);started=True;break
+  if p.poll() is not None:break
+  time.sleep(.5)
+ if not started:
+  if p.poll() is None:p.terminate()
+  raise RuntimeError('未收到 Windows 的启动确认。诊断日志：'+str(run/'rdp.log'))
+ p.wait()
+ if (run/'status.json').exists():
+  d=json.loads((run/'status.json').read_text(encoding='utf-8-sig'))
+  if d.get('state')=='exited' and d.get('code') not in (0,None):message('Windows 程序已退出，退出码：'+str(d['code'])+'。如为 3D 应用，可能需要 Windows 虚拟机不具备的图形加速。',True)
+def main():
+ if len(sys.argv)!=2:raise RuntimeError('请从文件管理器选择 EXE，用 WinBoat 打开。')
+ arg=sys.argv[1]
+ if arg.startswith('file://'):
+  u=urllib.parse.urlparse(arg)
+  if u.netloc not in ('','localhost'):raise RuntimeError('仅支持本机文件。')
+  arg=urllib.parse.unquote(u.path)
+ launch(Path(arg))
+if __name__=='__main__':
+ try:main()
+ except Exception as e:
+  print(str(e),file=sys.stderr);message(str(e),True);sys.exit(1)

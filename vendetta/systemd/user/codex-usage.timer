@@ -1,0 +1,8 @@
+[Unit]
+Description=Refresh Codex quota every five minutes
+[Timer]
+OnStartupSec=15
+OnUnitActiveSec=5min
+AccuracySec=15s
+[Install]
+WantedBy=timers.target

@@ -4,7 +4,15 @@ set -u
 case ${XDG_CURRENT_DESKTOP:-} in *Hyprland*|*hyprland*) ;; *) exit 0 ;; esac
 base="$HOME/.local/share/end4-vendetta"
 mkdir -p "$HOME/.local/state/end4-vendetta"
-dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE
+dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE
+systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE
+systemctl --user daemon-reload
+# Initialize X11 DPI before starting desktop applications.
+python3 "$HOME/.config/hypr/monitors.py"
+python3 "$HOME/.config/hypr/session-autostart-guard.py" &
+if ! pgrep -u "$(id -u)" -f '^/usr/lib/polkit-kde-authentication-agent-1' >/dev/null; then
+    /usr/lib/polkit-kde-authentication-agent-1 &
+fi
 "$base/repo/vendetta/qs" -c ii > "$HOME/.local/state/end4-vendetta/session.log" 2>&1 &
 shell_pid=$!
 wl-paste --type text --watch "$base/repo/vendetta/clipboard-store" &

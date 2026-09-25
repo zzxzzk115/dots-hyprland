@@ -25,6 +25,8 @@ Item { // Player instance
     property real maxVisualizerValue: 1000 // Max value in the data points
     property int visualizerSmoothing: 2 // Number of points to average for smoothing
     property real radius
+    readonly property string currentLyric: OmniLyrics.currentFor(player)
+    readonly property string nextLyric: OmniLyrics.nextFor(player)
 
     property string displayedArtFilePath: root.downloaded ? Qt.resolvedUrl(artFilePath) : ""
 
@@ -147,6 +149,7 @@ Item { // Player instance
         RowLayout {
             anchors.fill: parent
             anchors.margins: 13
+            anchors.bottomMargin: 68
             spacing: 15
 
             Rectangle { // Art background
@@ -278,6 +281,36 @@ Item { // Player instance
                     }
 
                     RippleButton {
+                        id: favoriteButton
+                        visible: CiderFavorites.isCider(root.player)
+                        enabled: CiderFavorites.matches(root.player) && !CiderFavorites.busy
+                        anchors.right: playPauseButton.left
+                        anchors.rightMargin: 8
+                        anchors.verticalCenter: playPauseButton.verticalCenter
+                        implicitWidth: 36
+                        implicitHeight: 36
+                        buttonRadius: 18
+                        downAction: () => CiderFavorites.toggle(root.player)
+                        colBackground: "transparent"
+                        colBackgroundHover: blendedColors.colSecondaryContainerHover
+                        colRipple: blendedColors.colSecondaryContainerActive
+                        Accessible.name: CiderFavorites.label(root.player)
+
+                        contentItem: MaterialSymbol {
+                            text: CiderFavorites.busy ? "hourglass_top" : "star"
+                            fill: CiderFavorites.isFavorite(root.player) ? 1 : 0
+                            iconSize: 24
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            color: CiderFavorites.isFavorite(root.player)
+                                ? blendedColors.colPrimary : blendedColors.colOnSecondaryContainer
+                        }
+                        StyledToolTip {
+                            text: CiderFavorites.label(root.player)
+                        }
+                    }
+
+                    RippleButton {
                         id: playPauseButton
                         anchors.right: parent.right
                         anchors.bottom: sliderRow.top
@@ -307,5 +340,34 @@ Item { // Player instance
                 }
             }
         }
+        Column {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 13
+            height: 42
+            spacing: 3
+
+            StyledText {
+                width: parent.width
+                text: root.currentLyric || OmniLyrics.placeholderFor(root.player)
+                textFormat: Text.PlainText
+                font.pixelSize: Appearance.font.pixelSize.normal
+                font.weight: Font.Medium
+                color: root.currentLyric ? blendedColors.colPrimary : blendedColors.colSubtext
+                elide: Text.ElideRight
+                horizontalAlignment: Text.AlignHCenter
+            }
+            StyledText {
+                width: parent.width
+                text: root.nextLyric
+                textFormat: Text.PlainText
+                font.pixelSize: Appearance.font.pixelSize.smaller
+                color: blendedColors.colSubtext
+                elide: Text.ElideRight
+                horizontalAlignment: Text.AlignHCenter
+            }
+        }
+
     }
 }

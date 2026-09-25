@@ -1,0 +1,24 @@
+Meta + Ctrl + Enter / Meta + D / Meta + Space → 应用启动器
+Meta + Enter → Kitty 终端
+Meta + B → Microsoft Edge 浏览器
+Meta + E → Dolphin 文件管理器
+Meta + C → 计算器
+Meta + Q → 关闭窗口
+Meta + F → 全屏
+Meta + M → 最大化
+Meta + T → 浮动窗口
+Meta + V → 剪贴板历史
+Meta + Tab → 窗口概览
+Meta + 1…9 / 0 → 工作区 1…10
+Meta + Shift + 数字 → 移动窗口到工作区
+Meta + 方向键 → 切换焦点
+Meta + Shift + 方向键 → 调整窗口大小
+Meta + Alt + 方向键 → 移动窗口
+Meta + Ctrl + K → 此快捷键表
+Meta + Ctrl + P → 电源菜单
+Meta + Ctrl + L → 锁屏
+Meta + Ctrl + B → 显示/隐藏顶栏
+Meta + N → 通知/控制中心
+Meta + I → end4 设置
+Meta + Print → 区域截图
+Meta + Shift + D → 备用启动器

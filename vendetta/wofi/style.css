@@ -1,0 +1,6 @@
+window { background-color: rgba(14,20,34,0.98); border: 1px solid #8bd5ca; border-radius: 14px; font-family: "Noto Sans"; font-size: 14px; color: #cad3f5; }
+#input { margin: 12px; padding: 10px; background-color: #202b3e; border: none; border-radius: 8px; color: #cad3f5; }
+#inner-box { margin: 8px; }
+#entry { padding: 8px; border-radius: 6px; }
+#entry:selected { background-color: #30445b; }
+#text { margin-left: 10px; }

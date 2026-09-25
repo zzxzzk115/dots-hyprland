@@ -1,0 +1,1 @@
+{"KPackageStructure": "Plasma/Applet", "KPlugin": {"Id": "local.workbench.codexusage", "Name": "Codex Usage", "Description": "Remaining Codex quota", "Version": "1.0", "License": "MIT", "Category": "System Information", "Icon": "view-statistics", "Authors": [{"Name": "Local Workbench"}]}, "X-Plasma-API-Minimum-Version": "6.0"}

@@ -19,7 +19,7 @@ Scope {
     readonly property var realPlayers: MprisController.players
     readonly property var meaningfulPlayers: filterDuplicatePlayers(realPlayers)
     readonly property real osdWidth: Appearance.sizes.osdWidth
-    readonly property real widgetWidth: Appearance.sizes.mediaControlsWidth
+    readonly property real widgetWidth: Math.max(Appearance.sizes.mediaControlsWidth, 560)
     readonly property real widgetHeight: Appearance.sizes.mediaControlsHeight
     property real popupRounding: Appearance.rounding.screenRounding - Appearance.sizes.hyprlandGapsOut + 1
     property list<real> visualizerPoints: []
@@ -135,7 +135,7 @@ Scope {
                         player: modelData
                         visualizerPoints: root.visualizerPoints
                         implicitWidth: root.widgetWidth
-                        implicitHeight: root.widgetHeight
+                        implicitHeight: root.widgetHeight + 56
                         radius: root.popupRounding
                     }
                 }
@@ -192,17 +192,17 @@ Scope {
         target: "mediaControls"
 
         function toggle(): void {
-            mediaControlsLoader.active = !mediaControlsLoader.active;
+            GlobalStates.mediaControlsOpen = !GlobalStates.mediaControlsOpen;
             if (mediaControlsLoader.active)
                 Notifications.timeoutAll();
         }
 
         function close(): void {
-            mediaControlsLoader.active = false;
+            GlobalStates.mediaControlsOpen = false;
         }
 
         function open(): void {
-            mediaControlsLoader.active = true;
+            GlobalStates.mediaControlsOpen = true;
             Notifications.timeoutAll();
         }
     }

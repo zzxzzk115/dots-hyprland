@@ -1,0 +1,6 @@
+[Unit]
+Description=Hyprland desktop application autostart
+BindsTo=graphical-session.target
+After=graphical-session.target
+Wants=xdg-desktop-autostart.target
+Before=xdg-desktop-autostart.target

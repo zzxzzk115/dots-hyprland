@@ -17,6 +17,8 @@ Item { // Bar content region
     property real useShortenedForm: (Appearance.sizes.barHellaShortenScreenWidthThreshold >= screen?.width) ? 2 : (Appearance.sizes.barShortenScreenWidthThreshold >= screen?.width) ? 1 : 0
     readonly property int centerSideModuleWidth: (useShortenedForm == 2) ? Appearance.sizes.barCenterSideModuleWidthHellaShortened : (useShortenedForm == 1) ? Appearance.sizes.barCenterSideModuleWidthShortened : Appearance.sizes.barCenterSideModuleWidth
 
+    readonly property int extraMusicWidth: Config.options.bar.verbose && useShortenedForm === 0 ? 140 : 0
+
     component VerticalBarSeparator: Rectangle {
         Layout.topMargin: Appearance.sizes.baseBarHeight / 3
         Layout.bottomMargin: Appearance.sizes.baseBarHeight / 3
@@ -105,13 +107,14 @@ Item { // Bar content region
             top: parent.top
             bottom: parent.bottom
             horizontalCenter: parent.horizontalCenter
+            horizontalCenterOffset: -root.extraMusicWidth / 2
         }
         spacing: 4
 
         BarGroup {
             id: leftCenterGroup
             anchors.verticalCenter: parent.verticalCenter
-            implicitWidth: root.centerSideModuleWidth
+            implicitWidth: root.centerSideModuleWidth + root.extraMusicWidth
 
             Resources {
                 alwaysShowAllResources: root.useShortenedForm === 2
@@ -167,6 +170,8 @@ Item { // Bar content region
             BarGroup {
                 id: rightCenterGroupContent
                 anchors.fill: parent
+
+                UsageIndicator { Layout.alignment: Qt.AlignVCenter }
 
                 ClockWidget {
                     showDate: (Config.options.bar.verbose && root.useShortenedForm < 2)
@@ -315,6 +320,12 @@ Item { // Bar content region
                         color: rightSidebarButton.colText
                     }
                 }
+            }
+
+            BarGroup {
+                visible: root.useShortenedForm === 0
+                Layout.alignment: Qt.AlignVCenter
+                NetworkSpeed {}
             }
 
             SysTray {

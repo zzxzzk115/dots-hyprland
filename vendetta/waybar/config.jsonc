@@ -1,0 +1,86 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 30,
+  "spacing": 0,
+  "margin-top": 7,
+  "margin-left": 8,
+  "margin-right": 8,
+  "modules-left": [
+    "hyprland/workspaces",
+    "hyprland/window"
+  ],
+  "modules-center": [
+    "clock"
+  ],
+  "modules-right": [
+    "custom/codex-usage",
+    "cpu",
+    "memory",
+    "disk",
+    "network",
+    "pulseaudio",
+    "battery",
+    "tray"
+  ],
+  "hyprland/workspaces": {
+    "format": "{name}",
+    "persistent-workspaces": {
+      "*": 3
+    }
+  },
+  "hyprland/window": {
+    "max-length": 26,
+    "separate-outputs": true
+  },
+  "clock": {
+    "format": "{:%a  %H:%M}",
+    "tooltip-format": "{:%Y-%m-%d}"
+  },
+  "cpu": {
+    "format": "CPU {usage}%",
+    "interval": 3
+  },
+  "memory": {
+    "format": "RAM {percentage}%",
+    "interval": 3
+  },
+  "disk": {
+    "format": "SSD {percentage_used}%",
+    "path": "/",
+    "interval": 30
+  },
+  "network": {
+    "format-wifi": "\u2193{bandwidthDownBytes} \u2191{bandwidthUpBytes}",
+    "format-ethernet": "\u2193{bandwidthDownBytes} \u2191{bandwidthUpBytes}",
+    "format-disconnected": "Offline",
+    "tooltip-format": "{ifname} \u00b7 {ipaddr}",
+    "interval": 3
+  },
+  "pulseaudio": {
+    "format": "VOL {volume}%",
+    "format-muted": "Muted",
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+  "battery": {
+    "format": "BAT {capacity}%",
+    "format-charging": "AC {capacity}%",
+    "format-plugged": "AC {capacity}%",
+    "states": {
+      "warning": 25,
+      "critical": 10
+    }
+  },
+  "tray": {
+    "icon-size": 14,
+    "spacing": 7
+  },
+  "custom/codex-usage": {
+    "exec": "$HOME/.local/bin/codex-usage --status",
+    "return-type": "json",
+    "interval": 30,
+    "format": "{}",
+    "tooltip": true,
+    "on-click": "$HOME/.local/bin/codex-usage --details"
+  }
+}

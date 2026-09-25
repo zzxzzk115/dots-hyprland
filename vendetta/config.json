@@ -48,10 +48,21 @@
     }
   },
   "apps": {
-    "terminal": "@KITTY@"
+    "terminal": "@KITTY@",
+    "bluetooth": "kcmshell6 kcm_bluetooth",
+    "network": "kcmshell6 kcm_networkmanagement",
+    "networkEthernet": "kcmshell6 kcm_networkmanagement",
+    "taskManager": "plasma-systemmonitor --page-name Processes",
+    "manageUser": "kcmshell6 kcm_users"
   },
   "bar": {
-    "cornerStyle": 1
+    "cornerStyle": 1,
+    "verbose": true,
+    "workspaces": {
+      "shown": 10,
+      "showAppIcons": true,
+      "monochromeIcons": true
+    }
   },
   "light": {
     "night": {
@@ -61,5 +72,11 @@
   "conflictKiller": {
     "autoKillTrays": false,
     "autoKillNotificationDaemons": false
+  },
+  "notifications": {
+    "monitor": {
+      "enable": false,
+      "name": ""
+    }
   }
 }

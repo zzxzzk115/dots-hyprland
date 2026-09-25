@@ -1,0 +1,8 @@
+show=drun
+width=520
+height=360
+prompt=Launch
+allow_images=true
+image_size=24
+insensitive=true
+term=@HOME@/.local/share/end4-vendetta/repo/vendetta/kitty

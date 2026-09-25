@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=WinBoat Windows Program
+Name[zh_CN]=用 WinBoat 运行 Windows 程序
+Comment=Start Windows if needed and run this EXE
+Exec=@HOME@/.local/bin/winboat-open %f
+Icon=winboat
+Terminal=false
+NoDisplay=true
+StartupNotify=false
+MimeType=application/vnd.microsoft.portable-executable;application/x-ms-dos-executable;application/x-msdownload;

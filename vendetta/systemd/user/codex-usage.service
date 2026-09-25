@@ -1,0 +1,6 @@
+[Unit]
+Description=Read Codex account quota
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/codex-usage --fetch
+TimeoutStartSec=50
