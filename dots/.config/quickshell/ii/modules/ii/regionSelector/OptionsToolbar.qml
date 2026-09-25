@@ -23,15 +23,27 @@ Toolbar {
     // Signals
     signal dismiss()
 
-    ToolbarTabBar {
-        id: tabBar
-        tabButtonList: [
-            {"icon": "activity_zone", "name": Translation.tr("Rect")},
-            {"icon": "gesture", "name": Translation.tr("Circle")}
-        ]
-        currentIndex: root.selectionMode === RegionSelection.SelectionMode.RectCorners ? 0 : 1
-        onCurrentIndexChanged: {
-            root.selectionMode = currentIndex === 0 ? RegionSelection.SelectionMode.RectCorners : RegionSelection.SelectionMode.Circle;
+    signal screenRequested()
+    RowLayout {
+        spacing: 4
+        Repeater {
+            model: [
+                {icon: "activity_zone", label: "区域", mode: RegionSelection.SelectionMode.RectCorners},
+                {icon: "select_window", label: "窗口", mode: RegionSelection.SelectionMode.Window},
+                {icon: "screenshot_monitor", label: "当前屏幕", mode: RegionSelection.SelectionMode.Screen},
+                {icon: "gesture", label: "圈选", mode: RegionSelection.SelectionMode.Circle}
+            ]
+            delegate: ToolbarTabButton {
+                required property var modelData
+                text: modelData.label
+                materialSymbol: modelData.icon
+                current: root.selectionMode === modelData.mode
+                onClicked: {
+                    root.selectionMode = modelData.mode;
+                    if (modelData.mode === RegionSelection.SelectionMode.Screen)
+                        root.screenRequested();
+                }
+            }
         }
     }
 }

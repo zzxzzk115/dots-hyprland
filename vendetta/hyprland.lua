@@ -100,3 +100,7 @@ hl.on('hyprland.shutdown', function() hl.exec_cmd('systemctl --user stop hyprlan
 
 -- Application workspace categories (scheme A).
 dofile(cfg .. '/workspace-rules.lua')
+
+-- Screenshot: region UI, window picker, and focused monitor.
+hl.bind('SUPER + SHIFT + Print', hl.dsp.global('quickshell:windowScreenshot'), {description='Screenshot window'})
+hl.bind('SUPER + CTRL + Print', hl.dsp.global('quickshell:screenScreenshot'), {description='Screenshot current screen'})

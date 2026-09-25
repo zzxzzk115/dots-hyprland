@@ -30,10 +30,11 @@ PanelWindow {
     // Modes
     // TODO: Ask: sidebar AI
     enum SnipAction { Copy, Edit, Search, CharRecognition, Record, RecordWithSound } 
-    enum SelectionMode { RectCorners, Circle }
+    enum SelectionMode { RectCorners, Circle, Window, Screen }
     enum Phase { Select, Post }
     property var action: RegionSelection.SnipAction.Copy
     property var selectionMode: RegionSelection.SelectionMode.RectCorners
+    property bool autoCaptureScreen: false
     property var phase: RegionSelection.Phase.Select
     signal dismiss()
 
@@ -116,9 +117,22 @@ PanelWindow {
 
     // Config
     property bool isCircleSelection: (root.selectionMode === RegionSelection.SelectionMode.Circle)
-    property bool enableWindowRegions: Config.options.regionSelector.targetRegions.windows && !isCircleSelection
-    property bool enableLayerRegions: Config.options.regionSelector.targetRegions.layers && !isCircleSelection
-    property bool enableContentRegions: Config.options.regionSelector.targetRegions.content
+    property bool enableWindowRegions: (root.selectionMode === RegionSelection.SelectionMode.Window || Config.options.regionSelector.targetRegions.windows) && !isCircleSelection && root.selectionMode !== RegionSelection.SelectionMode.Screen
+    property bool enableLayerRegions: Config.options.regionSelector.targetRegions.layers && root.selectionMode === RegionSelection.SelectionMode.RectCorners
+    property bool enableContentRegions: Config.options.regionSelector.targetRegions.content && root.selectionMode === RegionSelection.SelectionMode.RectCorners
+
+    onSelectionModeChanged: {
+        root.dragging = false;
+        root.dragDiffX = 0; root.dragDiffY = 0; root.points = [];
+        root.updateTargetedRegion(mouseArea.mouseX, mouseArea.mouseY);
+    }
+    function captureScreen() {
+        if (!root.preparationDone) return;
+        root.mouseButton = Qt.LeftButton;
+        root.regionX = 0; root.regionY = 0;
+        root.regionWidth = root.screen.width; root.regionHeight = root.screen.height;
+        root.snip();
+    }
 
     // Target
     property real targetedRegionX: -1
@@ -129,7 +143,7 @@ PanelWindow {
         return (root.targetedRegionX >= 0 && root.targetedRegionY >= 0)
     }
     function setRegionToTargeted() {
-        const padding = Config.options.regionSelector.targetRegions.selectionPadding; // Make borders not cut off n stuff
+        const padding = root.selectionMode === RegionSelection.SelectionMode.Window ? 0 : Config.options.regionSelector.targetRegions.selectionPadding; // Make borders not cut off n stuff
         root.regionX = root.targetedRegionX - padding;
         root.regionY = root.targetedRegionY - padding;
         root.regionWidth = root.targetedRegionWidth + padding * 2;
@@ -138,7 +152,7 @@ PanelWindow {
 
     function updateTargetedRegion(x, y) {
         // Image regions
-        const clickedRegion = root.imageRegions.find(region => {
+        const clickedRegion = root.enableContentRegions && root.imageRegions.find(region => {
             return region.at[0] <= x && x <= region.at[0] + region.size[0] && region.at[1] <= y && y <= region.at[1] + region.size[1];
         });
         if (clickedRegion) {
@@ -150,7 +164,7 @@ PanelWindow {
         }
 
         // Layer regions
-        const clickedLayer = root.layerRegions.find(region => {
+        const clickedLayer = root.enableLayerRegions && root.layerRegions.find(region => {
             return region.at[0] <= x && x <= region.at[0] + region.size[0] && region.at[1] <= y && y <= region.at[1] + region.size[1];
         });
         if (clickedLayer) {
@@ -162,7 +176,7 @@ PanelWindow {
         }
 
         // Window regions
-        const clickedWindow = root.windowRegions.find(region => {
+        const clickedWindow = root.enableWindowRegions && root.windowRegions.find(region => {
             return region.at[0] <= x && x <= region.at[0] + region.size[0] && region.at[1] <= y && y <= region.at[1] + region.size[1];
         });
         if (clickedWindow) {
@@ -192,6 +206,11 @@ PanelWindow {
         screenshotDir: root.screenshotDir
         screenshotPath: root.screenshotPath
         onExited: (exitCode, exitStatus) => {
+            if (exitCode !== 0) {
+                console.warn("[Region Selector] Screenshot capture failed");
+                root.dismiss();
+                return;
+            }
             if (root.enableContentRegions) imageDetectionProcess.running = true;
             root.preparationDone = !checkRecordingProc.running;
         }
@@ -215,6 +234,10 @@ PanelWindow {
             root.dismiss();
             return;
         }
+        if (root.autoCaptureScreen) {
+            root.captureScreen();
+            return;
+        }
         root.visible = true;
     }
 
@@ -228,10 +251,12 @@ PanelWindow {
         stdout: StdioCollector {
             id: imageDimensionCollector
             onStreamFinished: {
-                imageRegions = RegionFunctions.filterImageRegions(
-                    JSON.parse(imageDimensionCollector.text),
-                    root.windowRegions
-                );
+                try {
+                    const regions = JSON.parse(imageDimensionCollector.text || "[]");
+                    imageRegions = RegionFunctions.filterImageRegions(regions, root.windowRegions);
+                } catch (error) {
+                    imageRegions = []; // Optional content detection must not break screenshots.
+                }
             }
         }
     }
@@ -262,14 +287,17 @@ PanelWindow {
         // Validity check
         if (root.regionWidth <= 0 || root.regionHeight <= 0) {
             console.warn("[Region Selector] Invalid region size, skipping snip.");
-            root.dismiss();
+            return;
         }
 
         // Clamp region to screen bounds
-        root.regionX = Math.max(0, Math.min(root.regionX, root.screen.width - root.regionWidth));
-        root.regionY = Math.max(0, Math.min(root.regionY, root.screen.height - root.regionHeight));
-        root.regionWidth = Math.max(0, Math.min(root.regionWidth, root.screen.width - root.regionX));
-        root.regionHeight = Math.max(0, Math.min(root.regionHeight, root.screen.height - root.regionY));
+        const right = Math.min(root.screen.width, root.regionX + root.regionWidth);
+        const bottom = Math.min(root.screen.height, root.regionY + root.regionHeight);
+        root.regionX = Math.max(0, root.regionX);
+        root.regionY = Math.max(0, root.regionY);
+        root.regionWidth = Math.max(0, right - root.regionX);
+        root.regionHeight = Math.max(0, bottom - root.regionY);
+        if (root.regionWidth <= 0 || root.regionHeight <= 0) return;
 
         // Adjust action
         if (root.action === RegionSelection.SnipAction.Copy || root.action === RegionSelection.SnipAction.Edit) {
@@ -315,6 +343,13 @@ PanelWindow {
         Keys.onPressed: (event) => { // Esc to close
             if (event.key === Qt.Key_Escape) {
                 root.dismiss();
+                event.accepted = true;
+            } else if (event.key === Qt.Key_F) {
+                root.captureScreen(); event.accepted = true;
+            } else if (event.key === Qt.Key_W) {
+                root.selectionMode = RegionSelection.SelectionMode.Window; event.accepted = true;
+            } else if (event.key === Qt.Key_R) {
+                root.selectionMode = RegionSelection.SelectionMode.RectCorners; event.accepted = true;
             }
         }
     }
@@ -328,6 +363,7 @@ PanelWindow {
 
         // Controls
         onPressed: (mouse) => {
+            if (mouse.button === Qt.RightButton) { root.dismiss(); return; }
             root.dragStartX = mouse.x;
             root.dragStartY = mouse.y;
             root.draggingX = mouse.x;
@@ -336,6 +372,16 @@ PanelWindow {
             root.mouseButton = mouse.button;
         }
         onReleased: (mouse) => {
+            if (mouse.button === Qt.RightButton) return;
+            root.dragging = false;
+            if (root.selectionMode === RegionSelection.SelectionMode.Screen) {
+                root.captureScreen(); return;
+            }
+            if (root.selectionMode === RegionSelection.SelectionMode.Window) {
+                root.updateTargetedRegion(mouse.x, mouse.y);
+                if (!root.targetedRegionValid()) return;
+                root.setRegionToTargeted(); root.snip(); return;
+            }
             // Detect if it was a click -> Try to select targeted region
             if (root.draggingX === root.dragStartX && root.draggingY === root.dragStartY) {
                 if (root.targetedRegionValid()) {
@@ -359,7 +405,7 @@ PanelWindow {
         }
         onPositionChanged: (mouse) => {
             root.updateTargetedRegion(mouse.x, mouse.y);
-            if (!root.dragging) return;
+            if (!root.dragging || root.selectionMode === RegionSelection.SelectionMode.Window) return;
             root.draggingX = mouse.x;
             root.draggingY = mouse.y;
             root.dragDiffX = mouse.x - root.dragStartX;
@@ -527,6 +573,7 @@ PanelWindow {
                     property alias source: root.selectionMode
                 }
                 onDismiss: root.dismiss();
+                onScreenRequested: root.captureScreen();
             }
             ToolbarPairedFab {
                 anchors.verticalCenter: parent.verticalCenter

@@ -196,3 +196,26 @@ Hyprland was verified, with the actual Code window opening on workspace 2.
 The `linuxqq` wrapper similarly isolates shell environment and selects Wayland
 only on Hyprland; its expected app directory is version-specific. Neither
 application binary nor its personal settings are committed.
+
+
+## Screenshot modes
+
+- Super+Print opens the selector (plain Print remains unbound).
+- Super+Shift+Print opens explicit window selection; click a window to copy it.
+- Super+Ctrl+Print copies the focused monitor immediately.
+- The toolbar offers Region, Window, Current Screen and Circle. Current Screen
+  captures the monitor containing that toolbar; this is not a multi-monitor mosaic.
+- Inside the selector: R = Region, W = Window, F = capture current screen.
+  Escape or right-click cancels. Selection copies to the clipboard, or also saves
+  to the configured screenSnip.savePath when that preference is set.
+
+Window mode ignores content-region detection and uses exact window bounds,
+clipped to the selected monitor. It does not recover pixels hidden behind other
+windows. Optional content detection failures no longer throw JSON parse errors.
+An empty click keeps the picker open. Right-click now cancels rather than opening
+an optional external editor. New screenshot requests first dismiss the old overlay.
+
+Validated live: toolbar layout, window-picker layer creation, switching from the
+picker to focused-monitor capture (3840×2160 PNG), region open/cancel, and Hyprland
+configuration loading. Multi-monitor and manual window-click capture still need
+user validation on the intended layout.
