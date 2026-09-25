@@ -95,7 +95,7 @@ This sync does not reinstall or reload the current desktop.
 
 | Source under vendetta/ | Destination |
 |---|---|
-| hyprland.lua, session-start.sh, session-autostart-guard.py, monitors.py | ~/.config/hypr/ |
+| hyprland.lua, workspace-rules.lua, session-start.sh, session-autostart-guard.py, monitors.py | ~/.config/hypr/ |
 | browser.sh, launcher.sh, keybindings.sh, keybindings.txt, logout-menu.sh | ~/.config/hypr/ |
 | waybar/, wofi/, mako/ | corresponding directories in ~/.config/hypr/ |
 | systemd/user/hyprland-app-autostart.target | ~/.config/systemd/user/ |
@@ -148,3 +148,37 @@ are not included.
 CUDA/Nsight/JetBrains packages and GPU permission policies are outside this
 dotfiles sync. So are runtime binaries, Windows images, browser/login databases,
 personal tasks/notes, lyrics caches, API tokens and KDE panel placement.
+
+
+## Workspace categories (scheme A)
+
+`workspace-rules.lua` is loaded by the Hyprland config. Install both files together.
+New non-floating, non-modal main windows are assigned once with `silent`; existing
+windows and manually moved windows are not periodically rearranged. Unknown apps,
+terminals and Dolphin stay where opened. Workspace numbers and navigation keys
+remain unchanged; Super+0 selects workspace 10.
+
+| Workspace | Category | Examples |
+|---|---|---|
+| 1 | Browser | Edge, Firefox, Chromium |
+| 2 | Development | CLion/JetBrains, VS Code, CMake GUI |
+| 3 | Terminal/system | System Monitor, System Settings; terminals stay local |
+| 4 | Research | Zotero, Obsidian, Okular, TeXstudio |
+| 5 | Graphics | Godot, Blender, RenderDoc, Nsight |
+| 6 | AI | ChatGPT, Codex, Claude |
+| 7 | Communication | WeChat, QQ, Discord, Feishu, Telegram |
+| 8 | Office/Windows | LibreOffice, WPS, meetings, WinBoat |
+| 9 | Entertainment | Cider, Spotify, Steam, video players |
+| 10 | Temporary | No automatic assignments |
+
+Browser-hosted Jupyter/AI tools remain with the browser. Native app identifiers
+can vary with packaging; extend the class expressions using `hyprctl clients -j`.
+WinBoat defaults to workspace 8; a Cells of Division initial-title exception goes
+to 9 if its RemoteApp main window is non-floating and already has that title at
+creation. Other Windows games need specific rules. Dialogs intentionally do not
+match, leaving their normal compositor/application placement intact.
+
+Validation: the compositor accepted all rules with no configuration errors. Ten
+temporary Kitty windows with representative app IDs verified routes 1–9 and the
+unclassified fallback, with no active-workspace change. These tests validate rule
+behavior, not every application's actual startup identifier or dialog behavior.

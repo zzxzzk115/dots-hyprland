@@ -97,3 +97,6 @@ for _, event in ipairs({'hyprland.start', 'config.reloaded', 'monitor.added', 'm
 end
 
 hl.on('hyprland.shutdown', function() hl.exec_cmd('systemctl --user stop hyprland-app-autostart.target') end)
+
+-- Application workspace categories (scheme A).
+dofile(cfg .. '/workspace-rules.lua')
