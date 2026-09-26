@@ -10,7 +10,7 @@ local categories = {
     {6, 'ai', [[(?i)^(chatgpt|codex|claude|com.anthropic.claudefordesktop)$]]},
     {7, 'communication', [[(?i)^(wechat|weixin|com.tencent.wechat|com.tencent.weixin|qq|com.qq.QQ|discord|vesktop|feishu|bytedance-feishu|lark|slack|telegramdesktop|org.telegram.desktop)$]]},
     {8, 'office', [[(?i)^(libreoffice.*|wps.*|wpp|et|onlyoffice.*|wemeet.*|com.tencent.wemeet.*|zoom|teams.*|winboat|winboat-.*)$]]},
-    {9, 'entertainment', [[(?i)^(cider|sh.cider.Cider|spotify|vlc|mpv|org.videolan.VLC|steam|steam_app_.*|lutris|heroic|com.heroicgameslauncher.hgl)$]]},
+    {9, 'entertainment', [[(?i)^(cider|sh.cider.Cider|spotify|com.spotify.Client|yesplaymusic|vlc|mpv|org.videolan.VLC|steam|steam_app_.*|lutris|heroic|com.heroicgameslauncher.hgl)$]]},
 }
 for _, category in ipairs(categories) do
     hl.window_rule({

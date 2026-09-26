@@ -168,7 +168,7 @@ remain unchanged; Super+0 selects workspace 10.
 | 6 | AI | ChatGPT, Codex, Claude |
 | 7 | Communication | WeChat, QQ, Discord, Feishu, Telegram |
 | 8 | Office/Windows | LibreOffice, WPS, meetings, WinBoat |
-| 9 | Entertainment | Cider, Spotify, Steam, video players |
+| 9 | Entertainment | Cider, Spotify, YesPlayMusic, Steam, video players |
 | 10 | Temporary | No automatic assignments |
 
 Browser-hosted Jupyter/AI tools remain with the browser. Native app identifiers
