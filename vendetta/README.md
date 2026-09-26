@@ -219,3 +219,7 @@ Validated live: toolbar layout, window-picker layer creation, switching from the
 picker to focused-monitor capture (3840×2160 PNG), region open/cancel, and Hyprland
 configuration loading. Multi-monitor and manual window-click capture still need
 user validation on the intended layout.
+
+### GPU and disk indicators
+
+The horizontal resource bar includes NVIDIA GPU load and root-filesystem used percentage. Its resource popup shows VRAM usage, GPU temperature, and used/free/total disk space in GiB. The hardware sampler runs every 5 seconds with a 3-second NVIDIA query timeout; unavailable readings hide the corresponding indicator. Disk usage warns at 90%. On this machine `/` and `/home` share a filesystem, so one disk indicator covers both. KDE is unchanged.

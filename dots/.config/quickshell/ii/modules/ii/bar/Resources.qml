@@ -45,6 +45,20 @@ MouseArea {
             warningThreshold: Config.options.bar.resources.cpuWarningThreshold
         }
 
+        Resource {
+            iconName: "developer_board"
+            percentage: ResourceUsage.gpu?.usage ?? 0
+            shown: ResourceUsage.gpu !== null
+            Layout.leftMargin: shown ? 6 : 0
+        }
+        Resource {
+            iconName: "hard_drive"
+            percentage: ResourceUsage.disk?.usage ?? 0
+            shown: ResourceUsage.disk !== null
+            Layout.leftMargin: shown ? 6 : 0
+            warningThreshold: 90
+        }
+
     }
 
     ResourcesPopup {

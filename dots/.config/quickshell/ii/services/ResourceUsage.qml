@@ -115,4 +115,31 @@ Singleton {
             }
         }
     }
+    // GPU polling is bounded and independent of the CPU/RAM refresh rate.
+    property var gpu: null
+    property var disk: null
+    Timer {
+        interval: 5000
+        running: true
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: { if (!hardwareProc.running) hardwareProc.running = true }
+    }
+    Process {
+        id: hardwareProc
+        command: ["python3", Quickshell.shellPath("scripts/hardware_usage.py")]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    const data = JSON.parse(text)
+                    root.gpu = data.gpu
+                    root.disk = data.disk
+                } catch (e) {
+                    root.gpu = null
+                    root.disk = null
+                }
+            }
+        }
+    }
+
 }

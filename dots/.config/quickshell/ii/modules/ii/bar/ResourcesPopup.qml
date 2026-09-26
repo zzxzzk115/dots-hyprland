@@ -90,5 +90,42 @@ StyledPopup {
                 }
             }
         }
+        Column {
+            visible: ResourceUsage.gpu !== null
+            anchors.top: parent.top
+            spacing: 8
+            StyledPopupHeaderRow { icon: "developer_board"; label: "GPU" }
+            StyledPopupValueRow {
+                icon: "bolt"; label: "使用率"
+                value: `${Math.round((ResourceUsage.gpu?.usage ?? 0) * 100)}%`
+            }
+            StyledPopupValueRow {
+                icon: "memory"; label: "显存"
+                value: `${((ResourceUsage.gpu?.memoryUsed ?? 0) / 1024).toFixed(1)} / ${((ResourceUsage.gpu?.memoryTotal ?? 0) / 1024).toFixed(1)} GiB`
+            }
+            StyledPopupValueRow {
+                icon: "thermometer"; label: "温度"
+                value: `${ResourceUsage.gpu?.temperature ?? "--"} °C`
+            }
+        }
+        Column {
+            visible: ResourceUsage.disk !== null
+            anchors.top: parent.top
+            spacing: 8
+            StyledPopupHeaderRow { icon: "hard_drive"; label: "磁盘 /" }
+            StyledPopupValueRow {
+                icon: "clock_loader_60"; label: "已用"
+                value: `${((ResourceUsage.disk?.used ?? 0) / 1073741824).toFixed(1)} GiB`
+            }
+            StyledPopupValueRow {
+                icon: "check_circle"; label: "剩余"
+                value: `${((ResourceUsage.disk?.free ?? 0) / 1073741824).toFixed(1)} GiB`
+            }
+            StyledPopupValueRow {
+                icon: "empty_dashboard"; label: "总量"
+                value: `${((ResourceUsage.disk?.total ?? 0) / 1073741824).toFixed(1)} GiB`
+            }
+        }
+
     }
 }
