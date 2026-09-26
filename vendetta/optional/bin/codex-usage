@@ -17,7 +17,7 @@ def normalize(raw):
    if not w or w.get('usedPercent') is None:continue
    used=float(w['usedPercent'])
    if not math.isfinite(used):continue
-   mins=w.get('windowDurationMins');label='周额度' if mins==10080 else '5 小时额度' if mins==300 else str(mins)+' 分钟额度' if mins else '额度'
+   mins=w.get('windowDurationMins');label='Weekly limit' if mins==10080 else '5-hour limit' if mins==300 else str(mins)+'-minute limit' if mins else 'Usage'
    rows.append({'name':('' if key=='codex' else (b.get('limitName') or key)+' · ')+label,'remaining':max(0,min(100,100-used)),'resetsAt':w.get('resetsAt')})
  return rows
 def fetch():
@@ -50,7 +50,7 @@ def fetch():
   if not rows:raise RuntimeError('no quota data returned')
   old={'updated':time.time(),'windows':rows,'error':None}
  except Exception:
-  old['error']='额度暂时无法更新，请检查网络或 ChatGPT 登录状态。'
+  old['error']='Usage could not be updated. Check your network or ChatGPT sign-in.'
  finally:
   if p:
    p.terminate()
@@ -62,18 +62,19 @@ def status():
  stale=bool(d.get('error')) or time.time()-updated>600 or any(w.get('resetsAt') and time.time()>w['resetsAt'] for w in rows)
  value=min((w['remaining'] for w in rows),default=None)
  cls='stale' if stale else 'critical' if value is not None and value<10 else 'warning' if value is not None and value<20 else 'normal'
- lines=['Codex 剩余额度']
+ lines=['Codex remaining usage']
  for w in rows:
-  reset=time.strftime('%m-%d %H:%M %Z',time.localtime(w['resetsAt'])) if w.get('resetsAt') else '未知'
-  lines+=['%s：%g%%\n重置：%s'%(w['name'],w['remaining'],reset)]
- lines+=['更新：'+(time.strftime('%m-%d %H:%M:%S',time.localtime(updated)) if updated else '尚未获取')]
- if stale:lines+=['数据已过期' if rows else '暂无额度数据',d.get('error') or '等待刷新']
+  reset=time.strftime('%m-%d %H:%M %Z',time.localtime(w['resetsAt'])) if w.get('resetsAt') else 'Unknown'
+  lines+=['%s: %g%%\nResets: %s'%(w['name'],w['remaining'],reset)]
+ lines+=['Updated: '+(time.strftime('%m-%d %H:%M:%S',time.localtime(updated)) if updated else 'Not fetched yet')]
+ if stale:lines+=['Data is stale' if rows else 'No usage data available',d.get('error') or 'Waiting for refresh']
  detail='\n\n'.join(lines)
+ for old,new in {'额度暂时无法更新，请检查网络或 ChatGPT 登录状态。': 'Usage could not be updated. Check your network or ChatGPT sign-in.', 'Codex 剩余额度': 'Codex remaining usage', '周额度': 'Weekly limit', '5 小时额度': '5-hour limit', ' 分钟额度': '-minute limit', '尚未获取': 'Not fetched yet', '暂无额度数据': 'No usage data available', '数据已过期': 'Data is stale', '等待刷新': 'Waiting for refresh', '刷新额度': 'Refresh usage', '打开 ChatGPT': 'Open ChatGPT', 'Codex 额度': 'Codex usage', '未知': 'Unknown', '重置：': 'Resets: ', '更新：': 'Updated: ', '额度': 'Usage'}.items():detail=detail.replace(old,new)
  return {'text':str(round(value))+'%' if value is not None else '—','tooltip':html.escape(detail),'detail':detail,'class':cls,'percentage':value or 0,'remaining':value,'stale':stale}
 def refresh():subprocess.Popen(['systemctl','--user','start','--no-block','codex-usage.service'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
 def dialog():
  while True:
-  r=subprocess.run(['kdialog','--title','Codex 额度','--menu',status()['detail'],'refresh','刷新额度','open','打开 ChatGPT'],capture_output=True,text=True)
+  r=subprocess.run(['kdialog','--title','Codex usage','--menu',status()['detail'],'refresh','Refresh usage','open','Open ChatGPT'],capture_output=True,text=True)
   if r.returncode:return
   if r.stdout.strip()=='open':subprocess.Popen([str(Path.home()/'.local/bin/chatgpt')],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);return
   refresh();time.sleep(2)

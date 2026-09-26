@@ -96,15 +96,15 @@ StyledPopup {
             spacing: 8
             StyledPopupHeaderRow { icon: "developer_board"; label: "GPU" }
             StyledPopupValueRow {
-                icon: "bolt"; label: "使用率"
+                icon: "bolt"; label: "Load"
                 value: `${Math.round((ResourceUsage.gpu?.usage ?? 0) * 100)}%`
             }
             StyledPopupValueRow {
-                icon: "memory"; label: "显存"
+                icon: "memory"; label: "VRAM"
                 value: `${((ResourceUsage.gpu?.memoryUsed ?? 0) / 1024).toFixed(1)} / ${((ResourceUsage.gpu?.memoryTotal ?? 0) / 1024).toFixed(1)} GiB`
             }
             StyledPopupValueRow {
-                icon: "thermometer"; label: "温度"
+                icon: "thermometer"; label: "Temperature"
                 value: `${ResourceUsage.gpu?.temperature ?? "--"} °C`
             }
         }
@@ -112,17 +112,17 @@ StyledPopup {
             visible: ResourceUsage.disk !== null
             anchors.top: parent.top
             spacing: 8
-            StyledPopupHeaderRow { icon: "hard_drive"; label: "磁盘 /" }
+            StyledPopupHeaderRow { icon: "hard_drive"; label: "Disk /" }
             StyledPopupValueRow {
-                icon: "clock_loader_60"; label: "已用"
+                icon: "clock_loader_60"; label: "Used"
                 value: `${((ResourceUsage.disk?.used ?? 0) / 1073741824).toFixed(1)} GiB`
             }
             StyledPopupValueRow {
-                icon: "check_circle"; label: "剩余"
+                icon: "check_circle"; label: "Free"
                 value: `${((ResourceUsage.disk?.free ?? 0) / 1073741824).toFixed(1)} GiB`
             }
             StyledPopupValueRow {
-                icon: "empty_dashboard"; label: "总量"
+                icon: "empty_dashboard"; label: "Total"
                 value: `${((ResourceUsage.disk?.total ?? 0) / 1073741824).toFixed(1)} GiB`
             }
         }

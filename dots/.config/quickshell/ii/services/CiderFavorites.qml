@@ -74,19 +74,19 @@ Singleton {
 
     function label(player) {
         if (busy)
-            return "正在更新收藏…";
+            return "Updating favorite…";
         const error = lastError || snapshot.error;
         if (error === "auth_required")
-            return "请授权 Cider 的播放与音乐库访问";
+            return "Allow playback and library access in Cider";
         if (error === "invalid_config")
-            return "请检查 OmniLyrics 的 Cider 配置";
+            return "Check Cider settings in OmniLyrics";
         if (error === "not_confirmed" || error === "request_failed")
-            return "收藏未能确认，请稍后重试";
+            return "Could not confirm favorite status. Please try again";
         if (error === "track_changed")
-            return "歌曲已切换，正在刷新";
+            return "Track changed; refreshing…";
         if (!matches(player))
-            return error ? "暂时无法连接 Cider" : "正在读取收藏状态…";
-        return isFavorite(player) ? "取消收藏" : "收藏歌曲";
+            return error ? "Cannot connect to Cider" : "Loading favorite status…";
+        return isFavorite(player) ? "Remove from favorites" : "Add to favorites";
     }
 
     onTrackKeyChanged: {

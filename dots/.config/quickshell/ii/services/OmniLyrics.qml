@@ -39,10 +39,10 @@ Singleton {
 
     function placeholderFor(player) {
         if (!player)
-            return "等待播放";
+            return "Waiting for playback";
         if (!matchesPlayer(player) || snapshot.loading)
-            return "正在加载歌词…";
-        return snapshot.hasLyrics ? "♪" : "暂无歌词";
+            return "Loading lyrics…";
+        return snapshot.hasLyrics ? "♪" : "No lyrics available";
     }
 
     Process {

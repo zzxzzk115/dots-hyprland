@@ -16,7 +16,7 @@ RippleButton {
     colBackgroundToggled: Appearance.colors.colSecondaryContainer
     colBackgroundToggledHover: Appearance.colors.colSecondaryContainerHover
     colRippleToggled: Appearance.colors.colSecondaryContainerActive
-    Accessible.name: "实时网速"
+    Accessible.name: "Network speed"
     onClicked: popupLoader.active = !popupLoader.active
 
     contentItem: MaterialSymbol {
@@ -33,9 +33,9 @@ RippleButton {
 
         StyledText {
             anchors.centerIn: parent
-            text: "实时网速\n↓ " + (NetworkTraffic.available ? NetworkTraffic.formatRate(NetworkTraffic.download) : "—")
+            text: "Network speed\n↓ " + (NetworkTraffic.available ? NetworkTraffic.formatRate(NetworkTraffic.download) : "—")
                 + "   ↑ " + (NetworkTraffic.available ? NetworkTraffic.formatRate(NetworkTraffic.upload) : "—")
-                + "\n点击查看详情与测速"
+                + "\nClick for details and speed test"
             font.pixelSize: Appearance.font.pixelSize.smaller
             color: Appearance.m3colors.m3onSurfaceVariant
         }
@@ -76,7 +76,7 @@ RippleButton {
                     if (Qt.openUrlExternally("https://speed.cloudflare.com/"))
                         popupLoader.active = false;
                     else
-                        launchError = "无法打开浏览器，请稍后重试";
+                        launchError = "Could not open browser. Please try again";
                 }
                 Keys.onEscapePressed: popupLoader.active = false
             }

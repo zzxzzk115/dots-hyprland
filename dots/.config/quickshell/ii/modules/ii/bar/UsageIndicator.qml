@@ -7,7 +7,7 @@ import qs.modules.common.widgets
 Item {
  id: root
  readonly property string userHome: Quickshell.env("HOME")
- property var snapshot: ({text:"—",detail:"等待额度数据",class:"stale"})
+ property var snapshot: ({text:"—",detail:"Waiting for usage data",class:"stale"})
  implicitWidth: 48; implicitHeight: 28
  Process {id:reader;command:[root.userHome + "/.local/bin/codex-usage","--status"];running:true
   stdout: StdioCollector {onStreamFinished: {try {root.snapshot=JSON.parse(text);} catch(e) {}}}

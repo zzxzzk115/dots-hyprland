@@ -12,7 +12,7 @@ Rectangle {
     property real uploadRate: NetworkTraffic.upload
     property bool available: NetworkTraffic.available
     property bool connected: available && NetworkTraffic.interfaces.length > 0
-    property string connectionName: Network.networkName || "网络已连接"
+    property string connectionName: Network.networkName || "Connected"
     property string launchError: ""
     signal closeRequested()
     signal speedTestRequested()
@@ -99,13 +99,13 @@ Rectangle {
             StyledPopupHeaderRow {
                 Layout.fillWidth: true
                 icon: "speed"
-                label: "实时网速"
+                label: "Network speed"
             }
             RippleButton {
                 implicitWidth: 28
                 implicitHeight: 28
                 buttonRadius: Appearance.rounding.full
-                Accessible.name: "关闭网速卡片"
+                Accessible.name: "Close network speed card"
                 onClicked: root.closeRequested()
                 contentItem: MaterialSymbol {
                     text: "close"
@@ -127,7 +127,7 @@ Rectangle {
             }
             StyledText {
                 Layout.fillWidth: true
-                text: !root.available ? "正在读取网络状态…" : root.connected ? root.connectionName : "网络未连接"
+                text: !root.available ? "Loading network status…" : root.connected ? root.connectionName : "Disconnected"
                 elide: Text.ElideRight
                 font.pixelSize: Appearance.font.pixelSize.smaller
                 color: Appearance.m3colors.m3onSurfaceVariant
@@ -139,12 +139,12 @@ Rectangle {
             spacing: 8
             RateTile {
                 icon: "arrow_downward"
-                label: "下载"
+                label: "Download"
                 rate: root.downloadRate
             }
             RateTile {
                 icon: "arrow_upward"
-                label: "上传"
+                label: "Upload"
                 rate: root.uploadRate
             }
         }
@@ -162,12 +162,12 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 2
                 StyledText {
-                    text: "网络测速"
+                    text: "Speed test"
                     color: Appearance.m3colors.m3onSurface
                     font.pixelSize: Appearance.font.pixelSize.small
                 }
                 StyledText {
-                    text: "Cloudflare · 浏览器中打开"
+                    text: "Cloudflare · Opens in browser"
                     color: Appearance.m3colors.m3onSurfaceVariant
                     font.pixelSize: Appearance.font.pixelSize.smaller
                 }
@@ -178,13 +178,13 @@ Rectangle {
                 colBackground: Appearance.colors.colSecondaryContainer
                 colBackgroundHover: Appearance.colors.colSecondaryContainerHover
                 colRipple: Appearance.colors.colSecondaryContainerActive
-                Accessible.name: "打开网络测速页面"
+                Accessible.name: "Open speed test page"
                 onClicked: root.speedTestRequested()
                 contentItem: RowLayout {
                     spacing: 5
                     StyledText {
                         Layout.fillWidth: true
-                        text: "测速"
+                        text: "Test speed"
                         horizontalAlignment: Text.AlignRight
                         color: Appearance.m3colors.m3onSecondaryContainer
                     }

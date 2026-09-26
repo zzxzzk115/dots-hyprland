@@ -28,10 +28,10 @@ Toolbar {
         spacing: 4
         Repeater {
             model: [
-                {icon: "activity_zone", label: "区域", mode: RegionSelection.SelectionMode.RectCorners},
-                {icon: "select_window", label: "窗口", mode: RegionSelection.SelectionMode.Window},
-                {icon: "screenshot_monitor", label: "当前屏幕", mode: RegionSelection.SelectionMode.Screen},
-                {icon: "gesture", label: "圈选", mode: RegionSelection.SelectionMode.Circle}
+                {icon: "activity_zone", label: "Region", mode: RegionSelection.SelectionMode.RectCorners},
+                {icon: "select_window", label: "Window", mode: RegionSelection.SelectionMode.Window},
+                {icon: "screenshot_monitor", label: "Current screen", mode: RegionSelection.SelectionMode.Screen},
+                {icon: "gesture", label: "Circle", mode: RegionSelection.SelectionMode.Circle}
             ]
             delegate: ToolbarTabButton {
                 required property var modelData
