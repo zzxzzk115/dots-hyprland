@@ -116,6 +116,7 @@ Singleton {
         }
     }
     // GPU polling is bounded and independent of the CPU/RAM refresh rate.
+    property var cpuTemperature: null
     property var gpu: null
     property var disk: null
     Timer {
@@ -132,9 +133,11 @@ Singleton {
             onStreamFinished: {
                 try {
                     const data = JSON.parse(text)
+                    root.cpuTemperature = data.cpuTemperature ?? null
                     root.gpu = data.gpu
                     root.disk = data.disk
                 } catch (e) {
+                    root.cpuTemperature = null
                     root.gpu = null
                     root.disk = null
                 }

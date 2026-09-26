@@ -223,3 +223,5 @@ user validation on the intended layout.
 ### GPU and disk indicators
 
 The horizontal resource bar includes NVIDIA GPU load and root-filesystem used percentage. Its resource popup shows VRAM usage, GPU temperature, and used/free/total disk space in GiB. The hardware sampler runs every 5 seconds with a 3-second NVIDIA query timeout; unavailable readings hide the corresponding indicator. Disk usage warns at 90%. On this machine `/` and `/home` share a filesystem, so one disk indicator covers both. KDE is unchanged.
+
+CPU temperature is shown in the resource popup (English label), sampled from CPU package hwmon sensors every 5 seconds. Missing readings display a dash.
