@@ -92,7 +92,7 @@ StyledPopup {
                     icon: "speed"
                     label: "Frequency:"
                     value: ResourceUsage.cpuFrequency !== null
-                        ? `avg ${ResourceUsage.cpuFrequency.average.toFixed(2)} GHz; max ${ResourceUsage.cpuFrequency.max.toFixed(2)} GHz` : "avg —; max —"
+                        ? `(${ResourceUsage.cpuFrequency.average.toFixed(2)}, ${ResourceUsage.cpuFrequency.max.toFixed(2)}) GHz` : "(—, —) GHz"
                 }
                 StyledPopupValueRow {
                     icon: "thermometer"
