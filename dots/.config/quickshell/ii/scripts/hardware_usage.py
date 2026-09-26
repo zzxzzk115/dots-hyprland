@@ -42,4 +42,17 @@ for device in Path("/sys/class/hwmon").glob("hwmon*"):
         continue
 if package_temperatures:
     result["cpuTemperature"] = max(package_temperatures)
+# Kernel-reported current frequencies across online logical CPUs, in GHz.
+frequencies = []
+for cpu in Path("/sys/devices/system/cpu").glob("cpu[0-9]*"):
+    try:
+        if (cpu / "online").exists() and (cpu / "online").read_text().strip() != "1":
+            continue
+        frequency = float((cpu / "cpufreq/scaling_cur_freq").read_text().strip()) / 1_000_000
+        if frequency > 0:
+            frequencies.append(frequency)
+    except (OSError, ValueError):
+        continue
+result["cpuFrequency"] = ({"average": sum(frequencies) / len(frequencies),
+                           "max": max(frequencies)} if frequencies else None)
 print(json.dumps(result))

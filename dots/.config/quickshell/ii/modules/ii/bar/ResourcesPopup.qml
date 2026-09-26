@@ -89,6 +89,18 @@ StyledPopup {
                     value: `${Math.round(ResourceUsage.cpuUsage * 100)}%`
                 }
                 StyledPopupValueRow {
+                    icon: "speed"
+                    label: "Frequency (avg)"
+                    value: ResourceUsage.cpuFrequency !== null
+                        ? `${ResourceUsage.cpuFrequency.average.toFixed(2)} GHz` : "—"
+                }
+                StyledPopupValueRow {
+                    icon: "speed"
+                    label: "Frequency (max)"
+                    value: ResourceUsage.cpuFrequency !== null
+                        ? `${ResourceUsage.cpuFrequency.max.toFixed(2)} GHz` : "—"
+                }
+                StyledPopupValueRow {
                     icon: "thermometer"
                     label: "Temperature"
                     value: ResourceUsage.cpuTemperature !== null
