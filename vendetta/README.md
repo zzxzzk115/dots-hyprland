@@ -227,3 +227,7 @@ The horizontal resource bar includes NVIDIA GPU load and root-filesystem used pe
 CPU temperature is shown in the resource popup (English label), sampled from CPU package hwmon sensors every 5 seconds. Missing readings display a dash.
 
 CPU frequency details show the mean and maximum of kernel-reported `scaling_cur_freq` readings across online logical CPUs, in GHz, every 5 seconds. These are sampled readings, not workload-weighted effective clocks; the maximum is across CPUs in the current sample, not the rated turbo maximum.
+
+### Input switching
+
+Hyprland reserves Ctrl+Space for `fcitx5-remote -t` (English/Pinyin), so this shortcut no longer reaches application completion commands. The optional VS Code wrapper explicitly enables Wayland IME with text-input-v3. XWayland Chromium/Electron launchers should set `GTK_IM_MODULE=fcitx` within their Hyprland branch. Restart affected applications to apply launcher environment changes. KDE shortcuts are unchanged.

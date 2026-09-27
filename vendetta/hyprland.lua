@@ -104,3 +104,6 @@ dofile(cfg .. '/workspace-rules.lua')
 -- Screenshot: region UI, window picker, and focused monitor.
 hl.bind('SUPER + SHIFT + Print', hl.dsp.global('quickshell:windowScreenshot'), {description='Screenshot window'})
 hl.bind('SUPER + CTRL + Print', hl.dsp.global('quickshell:screenScreenshot'), {description='Screenshot current screen'})
+
+-- Reserve Ctrl+Space for input switching, independent of application hotkeys.
+hl.bind('CTRL + Space', hl.dsp.exec_cmd('fcitx5-remote -t'), {description='Toggle English / Chinese input'})

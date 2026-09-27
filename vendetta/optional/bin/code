@@ -4,6 +4,6 @@ if [ "${XDG_CONFIG_HOME:-}" = "$HOME/.config/hypr/end4-session" ]; then
 fi
 unset LD_LIBRARY_PATH QT_PLUGIN_PATH QML_IMPORT_PATH QML2_IMPORT_PATH
 case "${XDG_CURRENT_DESKTOP:-}" in
-    *Hyprland*|*hyprland*) exec "$HOME/.local/opt/vscode-1.139.1/VSCode-linux-x64/bin/code" --ozone-platform=wayland "$@" ;;
+    *Hyprland*|*hyprland*) exec "$HOME/.local/opt/vscode-1.139.1/VSCode-linux-x64/bin/code" --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 "$@" ;;
 esac
 exec "$HOME/.local/opt/vscode-1.139.1/VSCode-linux-x64/bin/code" "$@"
