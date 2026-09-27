@@ -307,11 +307,16 @@ PanelWindow {
         const screenshotDir = Config.options.screenSnip.savePath !== "" ? //
             Config.options.screenSnip.savePath : "";
         var screenshotAction = root.getScreenshotAction();
+        // Map the preview-local selection to the actual image dimensions.
+        const scaleX = !root.isRecording && screenshotPreview.status === Image.Ready
+            ? screenshotPreview.sourceSize.width / screenshotPreview.width : root.monitorScale;
+        const scaleY = !root.isRecording && screenshotPreview.status === Image.Ready
+            ? screenshotPreview.sourceSize.height / screenshotPreview.height : root.monitorScale;
         const command = ScreenshotAction.getCommand(
-            root.regionX * root.monitorScale, //
-            root.regionY * root.monitorScale, //
-            root.regionWidth * root.monitorScale,// 
-            root.regionHeight * root.monitorScale, //
+            root.regionX * scaleX,
+            root.regionY * scaleY,
+            root.regionWidth * scaleX,
+            root.regionHeight * scaleY,
             root.screenshotPath, //
             screenshotAction, //
             screenshotDir
@@ -333,10 +338,14 @@ PanelWindow {
         }
     }
 
-    ScreencopyView { // For freezing
+    Image {
+        id: screenshotPreview
         anchors.fill: parent
-        live: false
-        captureSource: root.screen
+        // Show the exact pixels that ScreenshotAction will crop, rather than
+        // taking a second compositor capture with an independent origin/time.
+        source: root.preparationDone ? "file://" + root.screenshotPath : ""
+        cache: false
+        fillMode: Image.Stretch
         visible: root.phase === RegionSelection.Phase.Select
 
         focus: root.visible
@@ -373,6 +382,10 @@ PanelWindow {
         }
         onReleased: (mouse) => {
             if (mouse.button === Qt.RightButton) return;
+            if (root.selectionMode === RegionSelection.SelectionMode.RectCorners) {
+                root.draggingX = mouse.x;
+                root.draggingY = mouse.y;
+            }
             root.dragging = false;
             if (root.selectionMode === RegionSelection.SelectionMode.Screen) {
                 root.captureScreen(); return;
