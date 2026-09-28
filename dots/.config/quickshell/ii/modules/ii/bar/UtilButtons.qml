@@ -20,6 +20,18 @@ Item {
         spacing: 4
         anchors.centerIn: parent
 
+        CircleUtilButton {
+            Layout.alignment: Qt.AlignVCenter
+            onClicked: Quickshell.execDetached(["fcitx5-remote", "-c"])
+            MaterialSymbol {
+                horizontalAlignment: Qt.AlignHCenter
+                fill: 0
+                text: "keyboard_capslock"
+                iconSize: Appearance.font.pixelSize.large
+                color: Appearance.colors.colOnLayer2
+            }
+        }
+
         Loader {
             active: Config.options.bar.utilButtons.showScreenSnip
             visible: Config.options.bar.utilButtons.showScreenSnip

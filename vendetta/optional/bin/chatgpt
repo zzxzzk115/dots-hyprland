@@ -6,6 +6,7 @@ if os.environ.get('XDG_CONFIG_HOME')==os.path.expanduser('~/.config/hypr/end4-se
  for key in ('XDG_CONFIG_HOME','XDG_STATE_HOME','XDG_CACHE_HOME'):os.environ.pop(key,None)
 for key in ('LD_LIBRARY_PATH','QT_PLUGIN_PATH','QML_IMPORT_PATH','QML2_IMPORT_PATH','QT_QPA_PLATFORM','QT_QPA_PLATFORMTHEME'):
  os.environ.pop(key,None)
+os.environ['GTK_IM_MODULE']='fcitx'
 scale=1.666667
 try:
  monitors=json.loads(subprocess.check_output(['hyprctl','-j','monitors'],text=True,timeout=3))

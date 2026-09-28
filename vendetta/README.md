@@ -230,4 +230,12 @@ CPU frequency details show the mean and maximum of kernel-reported `scaling_cur_
 
 ### Input switching
 
-Hyprland reserves Ctrl+Space for `fcitx5-remote -t` (English/Pinyin), so this shortcut no longer reaches application completion commands. The optional VS Code wrapper explicitly enables Wayland IME with text-input-v3. XWayland Chromium/Electron launchers should set `GTK_IM_MODULE=fcitx` within their Hyprland branch. Restart affected applications to apply launcher environment changes. KDE shortcuts are unchanged.
+Fcitx5 handles Ctrl+Space through the focused application's input-method context instead of a global Hyprland binding. Text fields can switch between English and Pinyin, while games without an active text-input context receive Ctrl+Space directly. The optional VS Code wrapper explicitly enables Wayland IME with text-input-v3. XWayland Chromium/Electron launchers should set `GTK_IM_MODULE=fcitx` within their Hyprland branch. Restart affected applications to apply launcher environment changes. KDE shortcuts are unchanged.
+
+
+### Cross-session configuration sync
+
+- Optional `fcitx5/config` and `fcitx5/profile` map to `~/.config/fcitx5/`. They preserve Ctrl+Space and English/Pinyin without exporting dictionaries or input history. Fcitx relies on the application's input context; applications that advertise a context outside text fields can still handle the key differently. There is no global Hyprland Ctrl+Space binding.
+- The keyboard icon in the bar switches Fcitx back to English. Browser and ChatGPT wrappers retain their current XWayland compatibility settings; the Hyprland branches set `GTK_IM_MODULE=fcitx`. The optional `microsoft-edge` wrapper maps to `~/.local/bin/microsoft-edge`.
+- `PlayerFavorites.qml` and `scripts/player_favorites.py` route favorites through OmniLyrics' shared `/favorites` API. A compatible running OmniLyrics service is required. Player credentials remain outside this repository; unsupported/unavailable state disables the action.
+- The Shilian sidebar widget, its window rules, and application remain maintained in their separate private repository. Local Shilian integration and `.orig` backups are intentionally not included in this public configuration sync.

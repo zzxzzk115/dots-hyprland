@@ -282,31 +282,28 @@ Item { // Player instance
 
                     RippleButton {
                         id: favoriteButton
-                        visible: CiderFavorites.isCider(root.player)
-                        enabled: CiderFavorites.matches(root.player) && !CiderFavorites.busy
+                        visible: PlayerFavorites.matches(root.player)
+                        enabled: PlayerFavorites.canToggle(root.player)
                         anchors.right: playPauseButton.left
                         anchors.rightMargin: 8
                         anchors.verticalCenter: playPauseButton.verticalCenter
                         implicitWidth: 36
                         implicitHeight: 36
                         buttonRadius: 18
-                        downAction: () => CiderFavorites.toggle(root.player)
+                        downAction: () => PlayerFavorites.toggle(root.player)
                         colBackground: "transparent"
                         colBackgroundHover: blendedColors.colSecondaryContainerHover
                         colRipple: blendedColors.colSecondaryContainerActive
-                        Accessible.name: CiderFavorites.label(root.player)
+                        Accessible.name: PlayerFavorites.label(root.player)
 
                         contentItem: MaterialSymbol {
-                            text: CiderFavorites.busy ? "hourglass_top" : "star"
-                            fill: CiderFavorites.isFavorite(root.player) ? 1 : 0
+                            text: "star"
+                            fill: PlayerFavorites.isFavorite(root.player) ? 1 : 0
                             iconSize: 24
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
-                            color: CiderFavorites.isFavorite(root.player)
+                            color: PlayerFavorites.isFavorite(root.player)
                                 ? blendedColors.colPrimary : blendedColors.colOnSecondaryContainer
-                        }
-                        StyledToolTip {
-                            text: CiderFavorites.label(root.player)
                         }
                     }
 
