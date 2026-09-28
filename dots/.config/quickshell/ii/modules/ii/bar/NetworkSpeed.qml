@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
 import qs.services
@@ -9,7 +10,7 @@ import qs.modules.common.widgets
 
 RippleButton {
     id: root
-    implicitWidth: 34
+    implicitWidth: speedLayout.implicitWidth + 16
     implicitHeight: Appearance.sizes.baseBarHeight - 8
     buttonRadius: Appearance.rounding.full
     toggled: popupLoader.active
@@ -19,12 +20,30 @@ RippleButton {
     Accessible.name: "Network speed"
     onClicked: popupLoader.active = !popupLoader.active
 
-    contentItem: MaterialSymbol {
-        text: "speed"
-        iconSize: Appearance.font.pixelSize.larger
-        fill: root.toggled ? 1 : 0
-        horizontalAlignment: Text.AlignHCenter
-        color: root.toggled ? Appearance.m3colors.m3onSecondaryContainer : Appearance.colors.colOnLayer0
+    contentItem: RowLayout {
+        id: speedLayout
+        spacing: 6
+        MaterialSymbol {
+            text: "speed"
+            iconSize: Appearance.font.pixelSize.larger
+            fill: root.toggled ? 1 : 0
+            Layout.alignment: Qt.AlignVCenter
+            color: root.toggled ? Appearance.m3colors.m3onSecondaryContainer : Appearance.colors.colOnLayer0
+        }
+        ColumnLayout {
+            spacing: 0
+            Layout.alignment: Qt.AlignVCenter
+            StyledText {
+                text: "↑ " + (NetworkTraffic.available ? NetworkTraffic.formatRate(NetworkTraffic.upload) : "—")
+                font.pixelSize: Appearance.font.pixelSize.smallest
+                color: root.toggled ? Appearance.m3colors.m3onSecondaryContainer : Appearance.colors.colOnLayer0
+            }
+            StyledText {
+                text: "↓ " + (NetworkTraffic.available ? NetworkTraffic.formatRate(NetworkTraffic.download) : "—")
+                font.pixelSize: Appearance.font.pixelSize.smallest
+                color: root.toggled ? Appearance.m3colors.m3onSecondaryContainer : Appearance.colors.colOnLayer0
+            }
+        }
     }
 
     StyledPopup {
