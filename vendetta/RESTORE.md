@@ -152,3 +152,22 @@ Ctrl+Space 由 Fcitx 根据文本上下文处理，不绑定全局 Hyprland；�
 - 再登录 KDE，确认显示器、通知、输入法均正常。恢复失败时在 KDE 中使用部署脚本输出的备份目录；不要复制旧系统整个 `/etc`。
 
 本次验证范围：本机包清单导出、Python/Shell/Lua 语法、安装/部署 dry-run、Hyprland 规则重载。没有在全新系统上完整安装验证。
+
+
+### Codex Quickshell 快捷菜单与 reset 公告
+
+点击栏上的额度百分比可打开原生菜单：启动 Codex、刷新额度与公告、打开 usage 页面、[Codex Reset](https://codex-reset.com/zh/) 和公告 X 原帖。悬停保留额度详情，菜单显示个人额度重置倒计时。界面使用英文。
+
+```sh
+install -Dm755 vendetta/optional/bin/codex-usage ~/.local/bin/codex-usage
+mkdir -p ~/.config/systemd/user
+cp vendetta/systemd/user/codex-{usage,reset-news}.{service,timer} ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now codex-usage.timer codex-reset-news.timer
+```
+
+依赖 Python 3、curl/系统 CA、notify-send、xdg-open，以及已登录的 Codex 应用。账户读取使用 `/usr/lib/chatgpt/resources/codex app-server`；换发行版时确认该路径和 `~/.local/bin/chatgpt` 启动包装器。无需额外 API key。
+
+公告每五分钟从公开 `/api/forecast` GET 获取；不会上传账户额度或认证信息。来源为独立第三方 codex-reset.com，菜单提供来源链接。仅在数据新鲜、明确的公告窗口尚未结束、公告后尚未重置、账户至少一个有效窗口剩余 ≥10% 时提醒，每条公告一次。历史概率、banked reset、已完成公告和没有明确时间的信号不触发催用提醒；个人常规额度倒计时仅显示。第三方结构改变或网络失败会停发提醒并显示 stale，不能保证发现每次临时公告。
+
+菜单可关闭或暂停提醒 24 小时。偏好保存在 `~/.config/codex-usage/widget.json`，公开公告缓存与去重状态在 `~/.cache/codex-usage/`，这些个人状态不入 Git。账户和公告独立 timer，公共网站故障不会阻塞额度刷新。验证：`python vendetta/tests/test_codex_usage.py`。

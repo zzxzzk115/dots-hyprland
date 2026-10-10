@@ -1,0 +1,6 @@
+[Unit]
+Description=Check public Codex reset announcements
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/codex-usage --fetch-news
+TimeoutStartSec=25

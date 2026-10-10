@@ -18,7 +18,7 @@ def normalize(raw):
    used=float(w['usedPercent'])
    if not math.isfinite(used):continue
    mins=w.get('windowDurationMins');label='Weekly limit' if mins==10080 else '5-hour limit' if mins==300 else str(mins)+'-minute limit' if mins else 'Usage'
-   rows.append({'name':('' if key=='codex' else (b.get('limitName') or key)+' · ')+label,'remaining':max(0,min(100,100-used)),'resetsAt':w.get('resetsAt')})
+   rows.append({'id':str(key)+':'+slot,'windowDurationMins':mins,'name':('' if key=='codex' else (b.get('limitName') or key)+' · ')+label,'remaining':max(0,min(100,100-used)),'resetsAt':w.get('resetsAt')})
  return rows
 def fetch():
  BASE.mkdir(parents=True,exist_ok=True);lock=(BASE/'lock').open('w')
@@ -78,9 +78,151 @@ def dialog():
   if r.returncode:return
   if r.stdout.strip()=='open':subprocess.Popen([str(Path.home()/'.local/bin/chatgpt')],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);return
   refresh();time.sleep(2)
+# Helpers appended to the existing account reader. No prompts or model calls.
+SETTINGS = Path.home()/'.config/codex-usage/widget.json'
+
+def load_json(path, default):
+ try:return json.loads(path.read_text())
+ except (OSError, ValueError):return default
+
+def write_json(path, value):
+ path.parent.mkdir(parents=True,exist_ok=True)
+ temp=path.with_suffix('.tmp')
+ temp.write_text(json.dumps(value));temp.chmod(0o600);temp.replace(path)
+
+def preferences():
+ return {'enabled':True,'snoozedUntil':0,**load_json(SETTINGS,{})}
+
+def countdown(seconds):
+ if seconds is None:return 'Unknown'
+ if seconds<=0:return 'Awaiting refresh'
+ minutes=max(1,math.ceil(seconds/60))
+ days,minutes=divmod(minutes,1440);hours,minutes=divmod(minutes,60)
+ return (f'{days}d ' if days else '')+(f'{hours}h ' if hours else '')+f'{minutes}m'
+
+def action(name):
+ if name=='open':subprocess.Popen([str(Path.home()/'.local/bin/chatgpt')]);return
+ if name=='usage':subprocess.Popen(['xdg-open','https://chatgpt.com/codex/settings/usage']);return
+ if name=='refresh':refresh();return
+ if name in ('toggle-reminders','snooze','resume'):
+  prefs=preferences()
+  if name=='toggle-reminders':prefs['enabled']=not prefs['enabled']
+  elif name=='snooze':prefs['snoozedUntil']=time.time()+86400
+  else:prefs.update(enabled=True,snoozedUntil=0)
+  write_json(SETTINGS,prefs);return
+ raise SystemExit('Unknown action')
+
+legacy_status=status
+
+def status():
+ out=legacy_status();data=read();now=time.time();rows=[]
+ for w in data.get('windows',[]):
+  reset=w.get('resetsAt');seconds=reset-now if isinstance(reset,(int,float)) else None
+  rows.append({**w,'countdown':countdown(seconds),'resetTime':time.strftime('%m-%d %H:%M %Z',time.localtime(reset)) if reset else 'Unknown'})
+ prefs=preferences()
+ out.update(windows=rows,remindersEnabled=prefs['enabled'],snoozed=prefs['snoozedUntil']>now,updated=data.get('updated',0))
+ if not out['stale']:
+  out['detail']+='\n\n'+'\n'.join(w['name']+': resets in '+w['countdown'] for w in rows)
+ return out
+
+# Public reset news stays separate from private account data.
+NEWS = BASE/'reset-news.json'
+NEWS_SENT = BASE/'reset-news-sent.json'
+SITE = 'https://codex-reset.com/zh/'
+
+def iso_time(value):
+ from datetime import datetime
+ try:return datetime.fromisoformat(str(value).replace('Z','+00:00')).timestamp()
+ except (ValueError,TypeError,OverflowError):return 0
+
+def source_url(value):
+ import re
+ return value if isinstance(value,str) and re.fullmatch(r'https://(?:x\.com|twitter\.com)/[A-Za-z0-9_]+/status/[0-9]+',value) else ''
+
+def news_status(data, now):
+ forecast=data.get('forecast') or {}
+ if not isinstance(forecast,dict):forecast={}
+ stale=bool(data.get('error')) or not 0<=now-data.get('updated',0)<=900 or not -60<=now-iso_time(forecast.get('updated_at'))<=900
+ signal=forecast.get('official_signal')
+ signal=signal if isinstance(signal,dict) else {}
+ window=signal.get('window') or {}
+ if not isinstance(window,dict):window={}
+ at=iso_time(signal.get('at'));end=iso_time(window.get('end_at'))
+ last=iso_time(forecast.get('last_reset_at'))
+ summary=str(signal.get('summary') or '')[:700]
+ label=str(window.get('label') or '')
+ url=source_url(signal.get('url'))
+ # Match the site's announced-window semantics; never promote its model odds.
+ upcoming=bool(not stale and url and summary and 'banked' not in summary.lower() and label and 'timing unspecified' not in label.lower() and 0<=now-at<=7*86400 and last<at and now<end<=now+7*86400)
+ message='Reset news unavailable or stale' if stale else 'Upcoming reset announced' if upcoming else 'Reset signal: timing unconfirmed' if signal and last<at and at<=now<at+86400 else 'No upcoming reset announced'
+ return {'stale':stale,'upcoming':upcoming,'message':message,'summary':summary if upcoming else '', 'url':url,'end':end,'id':str(signal.get('tweet_id') or url), 'lastReset':time.strftime('%m-%d %H:%M %Z',time.localtime(last)) if last else 'Unknown','updated':data.get('updated',0),'source':SITE}
+
+def fetch_news():
+ BASE.mkdir(parents=True,exist_ok=True)
+ with (BASE/'news.lock').open('w') as lock:
+  try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+  except BlockingIOError:return
+  data=load_json(NEWS,{})
+  if time.time()<data.get('retryAfter',0) or time.time()-data.get('attempted',0)<60:return
+  data['attempted']=time.time()
+  from urllib.request import Request,urlopen
+  from urllib.error import HTTPError
+  try:
+   req=Request('https://codex-reset.com/api/forecast',headers={'User-Agent':'end4-vendetta/1.0 (+https://github.com/zzxzzk115/dots-hyprland)'})
+   with urlopen(req,timeout=8) as response:raw=response.read(512*1024+1)
+   if len(raw)>512*1024:raise ValueError('Oversized response')
+   forecast=json.loads(raw)
+   if not isinstance(forecast,dict) or not iso_time(forecast.get('updated_at')):raise ValueError('Unknown schema')
+   data.update(forecast=forecast,updated=time.time(),error=None,retryAfter=0)
+  except HTTPError as error:
+   data['error']='Reset news could not be refreshed'
+   if error.code==429:
+    retry=error.headers.get('Retry-After','300')
+    from email.utils import parsedate_to_datetime
+    try:delay=int(retry) if retry.isdigit() else parsedate_to_datetime(retry).timestamp()-time.time()
+    except (ValueError,TypeError,OverflowError):delay=300
+    data['retryAfter']=time.time()+max(60,delay)
+  except Exception:data['error']='Reset news could not be refreshed'
+  write_json(NEWS,data)
+ remind_news()
+
+def remind_news():
+ now=time.time();prefs=preferences();news=news_status(load_json(NEWS,{}),now)
+ if not prefs['enabled'] or prefs['snoozedUntil']>now or not news['upcoming']:return
+ account=read()
+ if account.get('error') or not 0<=now-account.get('updated',0)<=600:return
+ remaining=max((w.get('remaining',0) for w in account.get('windows',[]) if (w.get('resetsAt') or 0)>now),default=0)
+ if remaining<10:return
+ with (BASE/'news-notify.lock').open('w') as lock:
+  fcntl.flock(lock,fcntl.LOCK_EX)
+  sent={k:v for k,v in load_json(NEWS_SENT,{}).items() if v>now}
+  key=news['id']
+  if key in sent:return
+  body=f"An upcoming reset is reported; you still have usage available. Consider finishing useful work before the announced window ends in {countdown(news['end']-now)}.\nData: codex-reset.com\n{news['url']}"
+  try:result=subprocess.run(['notify-send','--app-name=Codex','--icon=appointment-soon','Codex reset announcement',body],timeout=5)
+  except (OSError,subprocess.TimeoutExpired):return
+  if result.returncode==0:sent[key]=news['end'];write_json(NEWS_SENT,sent)
+
+base_action=action
+
+def action(name):
+ if name in ('reset-site','reset-source'):
+  url=SITE if name=='reset-site' else news_status(load_json(NEWS,{}),time.time())['url'] or SITE
+  subprocess.Popen(['xdg-open',url]);return
+ if name=='refresh':
+  subprocess.run(['systemctl','--user','start','--no-block','codex-reset-news.service'],check=False)
+ base_action(name)
+
+base_status=status
+
+def status():
+ out=base_status();out['news']=news_status(load_json(NEWS,{}),time.time());return out
+
 if __name__=='__main__':
  arg=sys.argv[1] if len(sys.argv)>1 else '--status'
- if arg=='--fetch':fetch()
- elif arg=='--refresh':refresh()
+ if arg=='--fetch':fetch();remind_news()
+ elif arg=='--fetch-news':fetch_news()
+ elif arg=='--refresh':action('refresh')
  elif arg=='--details':dialog()
+ elif arg=='--action' and len(sys.argv)==3:action(sys.argv[2])
  else:print(json.dumps(status(),ensure_ascii=False))
