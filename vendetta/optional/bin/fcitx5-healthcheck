@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# A running process is not enough: the Wayland/DBus frontend can become
+# unresponsive while fcitx5 itself stays alive. Restart only after two probes
+# fail, to avoid reacting to a short-lived desktop/session transition.
+if ! systemctl --user is-active --quiet fcitx5.service; then
+    exit 0
+fi
+
+if timeout 3 fcitx5-remote >/dev/null 2>&1; then
+    rm -f "${XDG_RUNTIME_DIR:-/tmp}/fcitx5-healthcheck.failed"
+    exit 0
+fi
+
+marker="${XDG_RUNTIME_DIR:-/tmp}/fcitx5-healthcheck.failed"
+if [ -e "$marker" ]; then
+    rm -f "$marker"
+    systemctl --user restart fcitx5.service
+    notify-send -a Fcitx5 -i input-keyboard \
+        "Input method recovered" \
+        "Fcitx stopped responding and was restarted automatically."
+else
+    : >"$marker"
+fi

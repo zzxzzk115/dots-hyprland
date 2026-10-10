@@ -1,0 +1,13 @@
+[Unit]
+Description=Fcitx 5 input method
+After=graphical-session-pre.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/fcitx5 --disable=clipboard,cloudpinyin,spell,kimpanel,virtualkeyboard,ibusfrontend,fcitx4frontend
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=default.target

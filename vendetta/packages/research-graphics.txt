@@ -1,0 +1,16 @@
+blender
+renderdoc
+perf
+heaptrack
+valgrind
+jupyterlab
+python-scipy
+python-pandas
+python-matplotlib
+gnuplot
+eigen
+glfw
+assimp
+vulkan-headers
+vulkan-validation-layers
+zotero

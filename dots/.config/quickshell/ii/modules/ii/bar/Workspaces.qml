@@ -13,8 +13,7 @@ import Quickshell.Hyprland
 
 ButtonMouseArea {
     id: root
-    readonly property var categoryNames: ["Browser", "Development", "System", "Research", "Graphics",
-        "AI", "Communication", "Office", "Entertainment", "Temporary"]
+    readonly property var categoryNames: ["Development", "Browser", "AI", "Entertainment", "Communication", "System", "Research", "Graphics", "Office", "Temporary"]
     StyledPopup {
         hoverTarget: root
         active: root.containsMouse && !root.pressed

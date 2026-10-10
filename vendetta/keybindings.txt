@@ -24,8 +24,8 @@ Meta + Print → 区域截图
 Meta + Shift + D → 备用启动器
 
 Workspace 分类（方案 A，新窗口静默归位）
-1 浏览器 · 2 开发 · 3 终端/系统 · 4 科研 · 5 图形
-6 AI · 7 通信 · 8 办公/Windows · 9 娱乐 · 10 临时
+1 Development · 2 Browser · 3 AI · 4 Entertainment · 5 Communication
+6 System · 7 Research · 8 Graphics · 9 Office · 10 Temporary
 终端、Dolphin 和未分类应用留在当前位置；浮动/模态窗口不强制分类。
 
 Meta + Shift + Print → 选择窗口截图

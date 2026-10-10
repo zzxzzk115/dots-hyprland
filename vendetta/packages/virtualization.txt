@@ -1,0 +1,5 @@
+docker
+docker-compose
+qemu-system-x86
+edk2-ovmf
+freerdp

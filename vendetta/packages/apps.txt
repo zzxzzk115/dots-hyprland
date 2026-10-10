@@ -1,0 +1,11 @@
+firefox
+discord
+spotify
+steam
+haruna
+mpv
+libreoffice-fresh
+rustdesk
+btop
+yazi
+zoxide

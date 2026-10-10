@@ -19,7 +19,7 @@ wl-paste --type text --watch "$base/repo/vendetta/clipboard-store" &
 text_watcher=$!
 wl-paste --type image --watch "$base/repo/vendetta/clipboard-store" &
 image_watcher=$!
-if ! pgrep -u "$(id -u)" -x fcitx5 >/dev/null; then fcitx5 -d; fi
+systemctl --user start --no-block fcitx5.service
 wait "$shell_pid"
 kill "$text_watcher" "$image_watcher" 2>/dev/null || true
 # If the shell cannot start, retain a usable launcher, wallpaper, bar and notifications.

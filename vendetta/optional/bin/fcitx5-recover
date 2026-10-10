@@ -1,0 +1,6 @@
+#!/bin/sh
+
+systemctl --user restart fcitx5.service
+sleep 1
+fcitx5-remote -o
+notify-send -a Fcitx5 -i input-keyboard "Input method restored" "Press Ctrl+Space in a text field to switch languages."

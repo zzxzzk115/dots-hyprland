@@ -1,0 +1,8 @@
+baidunetdisk-bin
+eudic-ting-en-bin
+gittyup
+microsoft-edge-stable
+monado-simulated
+rustdesk
+spotify
+wechat-bin

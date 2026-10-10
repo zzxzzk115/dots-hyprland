@@ -22,7 +22,10 @@ Item {
 
         CircleUtilButton {
             Layout.alignment: Qt.AlignVCenter
-            onClicked: Quickshell.execDetached(["fcitx5-remote", "-c"])
+            onClicked: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/fcitx5-english"])
+            altAction: () => Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/fcitx5-recover"])
+            Accessible.name: "Switch to English input"
+            Accessible.description: "Left click switches to English; right click restarts Fcitx 5"
             MaterialSymbol {
                 horizontalAlignment: Qt.AlignHCenter
                 fill: 0

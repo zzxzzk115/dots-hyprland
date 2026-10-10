@@ -1,0 +1,7 @@
+[Unit]
+Description=Check whether the Fcitx 5 DBus interface responds
+After=fcitx5.service
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/fcitx5-healthcheck

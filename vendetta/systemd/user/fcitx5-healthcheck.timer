@@ -1,0 +1,11 @@
+[Unit]
+Description=Periodically check Fcitx 5 responsiveness
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+AccuracySec=10s
+Unit=fcitx5-healthcheck.service
+
+[Install]
+WantedBy=timers.target

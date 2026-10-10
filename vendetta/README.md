@@ -1,3 +1,5 @@
+> 换机恢复请先阅读 [迁移与软件安装清单](RESTORE.md)。软件快照位于 `packages/`；不要将整机快照直接批量安装。
+
 # Vendetta — Hyprland-only end-4 profile
 
 Black/crimson end-4 Quickshell desktop with a generated V for Vendetta wallpaper
@@ -160,21 +162,21 @@ remain unchanged; Super+0 selects workspace 10.
 
 | Workspace | Category | Examples |
 |---|---|---|
-| 1 | Browser | Edge, Firefox, Chromium |
-| 2 | Development | CLion/JetBrains, VS Code, CMake GUI |
-| 3 | Terminal/system | System Monitor, System Settings, RustDesk; terminals stay local |
-| 4 | Research | Zotero, Obsidian, Okular, TeXstudio |
-| 5 | Graphics | Godot, Blender, RenderDoc, Nsight |
-| 6 | AI | ChatGPT, Codex, Claude |
-| 7 | Communication | WeChat, QQ, Discord, Feishu, Telegram |
-| 8 | Office/Windows | LibreOffice, WPS, meetings, WinBoat |
-| 9 | Entertainment | Cider, Spotify, YesPlayMusic, Steam, video players |
-| 10 | Temporary | No automatic assignments |
+| 1 | Development | IDEs, Neovide, Monado |
+| 2 | Browser | Edge, Firefox |
+| 3 | AI | ChatGPT, Codex, Claude |
+| 4 | Entertainment | Spotify, Cider, YesPlayMusic, Steam, players |
+| 5 | Communication | QQ, WeChat, Discord, Feishu |
+| 6 | System | Settings, monitors, RustDesk |
+| 7 | Research | Zotero, notebooks, PDF tools |
+| 8 | Graphics | Blender, Godot, RenderDoc, Nsight |
+| 9 | Office | Office, meetings, WinBoat |
+| 10 | Temporary | Unrestricted |
 
 Browser-hosted Jupyter/AI tools remain with the browser. Native app identifiers
 can vary with packaging; extend the class expressions using `hyprctl clients -j`.
-WinBoat defaults to workspace 8; a Cells of Division initial-title exception goes
-to 9 if its RemoteApp main window is non-floating and already has that title at
+WinBoat defaults to workspace 9; a Cells of Division initial-title exception goes
+to 4 if its RemoteApp main window is non-floating and already has that title at
 creation. Other Windows games need specific rules. Dialogs intentionally do not
 match, leaving their normal compositor/application placement intact.
 
@@ -184,15 +186,15 @@ unclassified fallback, with no active-workspace change. These tests validate rul
 behavior, not every application's actual startup identifier or dialog behavior.
 
 
-Workspace display names are now Browser, Development, System, Research, Graphics,
-AI, Communication, Office, Entertainment and Temporary (IDs 1–10 unchanged).
+Workspace display names are now Development, Browser, AI, Entertainment, Communication,
+System, Research, Graphics, Office and Temporary (IDs 1–10).
 The compact bar retains its icons/numbers and shows the category on hover.
 
 Optional `code` wrapper expects the Microsoft stable archive unpacked under
 `~/.local/opt/vscode-1.139.1/VSCode-linux-x64`; render `code.desktop.in` as above.
 This is a user-local installation, not a pacman-managed package; update the
 archive directory and launcher/icon paths when upgrading. Native Wayland on
-Hyprland was verified, with the actual Code window opening on workspace 2.
+Hyprland was verified, with the actual Code window opening on workspace 2 at that time (now workspace 1).
 The `linuxqq` wrapper similarly isolates shell environment and selects Wayland
 only on Hyprland; its expected app directory is version-specific. Neither
 application binary nor its personal settings are committed.
@@ -230,12 +232,12 @@ CPU frequency details show the mean and maximum of kernel-reported `scaling_cur_
 
 ### Input switching
 
-Fcitx5 handles Ctrl+Space through the focused application's input-method context instead of a global Hyprland binding. Text fields can switch between English and Pinyin, while games without an active text-input context receive Ctrl+Space directly. The optional VS Code wrapper explicitly enables Wayland IME with text-input-v3. XWayland Chromium/Electron launchers should set `GTK_IM_MODULE=fcitx` within their Hyprland branch. Restart affected applications to apply launcher environment changes. KDE shortcuts are unchanged.
+Fcitx5 handles Ctrl+Space through the focused application's input-method context instead of a global Hyprland binding. Text fields can switch between English and Chinese, while games without an active text-input context receive Ctrl+Space directly. The optional VS Code wrapper explicitly enables Wayland IME with text-input-v3. XWayland Chromium/Electron launchers should set `GTK_IM_MODULE=fcitx` within their Hyprland branch. Restart affected applications to apply launcher environment changes. KDE shortcuts are unchanged.
 
 
 ### Cross-session configuration sync
 
-- Optional `fcitx5/config` and `fcitx5/profile` map to `~/.config/fcitx5/`. They preserve Ctrl+Space and English/Pinyin without exporting dictionaries or input history. Fcitx relies on the application's input context; applications that advertise a context outside text fields can still handle the key differently. There is no global Hyprland Ctrl+Space binding.
+- Optional `fcitx5/config` and `fcitx5/profile` map to `~/.config/fcitx5/`. They preserve Ctrl+Space and English/Chinese (currently Rime) without exporting dictionaries or input history. Fcitx relies on the application's input context; applications that advertise a context outside text fields can still handle the key differently. There is no global Hyprland Ctrl+Space binding.
 - The keyboard icon in the bar switches Fcitx back to English. Browser and ChatGPT wrappers retain their current XWayland compatibility settings; the Hyprland branches set `GTK_IM_MODULE=fcitx`. The optional `microsoft-edge` wrapper maps to `~/.local/bin/microsoft-edge`.
 - `PlayerFavorites.qml` and `scripts/player_favorites.py` route favorites through OmniLyrics' shared `/favorites` API. A compatible running OmniLyrics service is required. Player credentials remain outside this repository; unsupported/unavailable state disables the action.
 - The Shilian sidebar widget, its window rules, and application remain maintained in their separate private repository. Local Shilian integration and `.orig` backups are intentionally not included in this public configuration sync.
